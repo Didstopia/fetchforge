@@ -14,6 +14,17 @@ _TODO_
 
 _TODO_
 
+## Development
+
+_WIP_
+
+```sh
+npm i
+npm link
+
+fetchforge download Dids
+```
+
 ## Disclaimer
 
 Fetchforge is in no way affiliated with, authorized, maintained or endorsed by [forge.gg](https://forge.gg/) or any of its affiliates or subsidiaries. This is an independent and unofficial project. Use at your own risk.

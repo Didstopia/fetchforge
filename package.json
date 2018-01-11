@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "description": "A command line application for downloading clips from forge.gg",
   "main": "src/index.js",
+  "preferGlobal": true,
+  "bin": "src/index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "standard | snazzy && mocha",
+    "start": "node src/index.js"
   },
   "repository": {
     "type": "git",
@@ -27,5 +30,15 @@
   "bugs": {
     "url": "https://github.com/Didstopia/fetchforge/issues"
   },
-  "homepage": "https://github.com/Didstopia/fetchforge#readme"
+  "homepage": "https://github.com/Didstopia/fetchforge#readme",
+  "devDependencies": {
+    "mocha": "^4.1.0",
+    "standard": "^10.0.3"
+  },
+  "dependencies": {
+    "commander": "^2.13.0",
+    "inquirer": "^5.0.0",
+    "r2": "^2.0.0",
+    "scrape-it": "^4.1.2"
+  }
 }
