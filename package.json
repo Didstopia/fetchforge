@@ -1,0 +1,31 @@
+{
+  "name": "fetchforge",
+  "version": "0.1.0",
+  "description": "A command line application for downloading clips from forge.gg",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Didstopia/fetchforge.git"
+  },
+  "keywords": [
+    "forge.gg",
+    "clip",
+    "download",
+    "scrape",
+    "forge",
+    "video",
+    "obs",
+    "capture",
+    "xsplit",
+    "fetch"
+  ],
+  "author": "Didstopia <support@didstopia.com> (https://didstopia.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Didstopia/fetchforge/issues"
+  },
+  "homepage": "https://github.com/Didstopia/fetchforge#readme"
+}
