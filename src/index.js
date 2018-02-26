@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+// TODO: Replicate the XHR requests in Chrome web tools when scrolling the page,
+//       so we can replicate the API calls and call them ourselves, so we're not
+//       actually trying to emulate a browser/scrape per se
+// A bit more details on this here: https://www.reddit.com/r/HTML/comments/5n82fz/html_scraping_dynamically_on_scroll/
+
 const constants = require('./utils/constants')
 const log = require('./utils/log')
 
