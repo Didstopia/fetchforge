@@ -16,7 +16,7 @@ class API {
     log.debug('New API() constructed for userId:', userId)
   }
 
-  // TODO: Should we go for 25, 50 or 100 videos at a time?
+  // TODO: We might want to go for 24 clips a a time, since that's the default for forge.gg
   async loadVideos (afterId = '', index = 0, count = 1) {
     log.debug('Loading videos after id, at index and with count:', afterId, index, count)
 
@@ -28,7 +28,7 @@ class API {
       }
     }
 
-    log.debug('requestBody:', JSON.stringify(requestBody, null, 2))
+    // log.debug('requestBody:', JSON.stringify(requestBody, null, 2))
 
     // Execute the async request
     let response = await r2.post(constants.FORGE_API_BASE, { json: requestBody }).response
@@ -64,7 +64,7 @@ class API {
       result = moreResults
     }
 
-    log.debug('Result:', JSON.stringify(result, null, 2))
+    // log.debug('Result:', JSON.stringify(result, null, 2))
     log.debug('Total video count:', result.videos.length)
     return result
   }

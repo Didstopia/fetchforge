@@ -8,6 +8,8 @@ const fs = require('fs')
 const path = require('path')
 const promisify = require('util').promisify
 const stat = promisify(fs.stat)
+const mkdir = promisify(fs.mkdir)
+const writeFile = promisify(fs.writeFile)
 const sanitize = require('sanitize-filename')
 const ForgeAPI = require('../api')
 
@@ -28,11 +30,11 @@ const download = async (username) => {
 
         // Prepare the download path
         let downloadPath = constants.DOWNLOAD_PATH
-        try { if (!await stat(downloadPath)) await fs.mkdir(downloadPath) } catch (e) { }
+        try { await stat(downloadPath) } catch (e) { await mkdir(downloadPath) }
 
         // Make sure a folder exists per user
         let userPath = path.join(downloadPath, username)
-        try { if (!await stat(userPath)) await fs.mkdir(userPath) } catch (e) { }
+        try { await stat(userPath) } catch (e) { await mkdir(userPath) }
 
         // TODO: Start downloading each video file to the local filesystem
         for (let i in result.videos) {
@@ -40,7 +42,7 @@ const download = async (username) => {
 
           // Make sure a folder exists per game
           let gamePath = path.join(userPath, video.game.slug)
-          try { if (!await stat(gamePath)) await fs.mkdir(gamePath) } catch (e) { }
+          try { await stat(gamePath) } catch (e) { await mkdir(gamePath) }
 
           // TODO: Could we potentially set the "creation" dates from the "createdAt" property instead?
 
@@ -49,40 +51,41 @@ const download = async (username) => {
           let baseName = sanitize(video.title ? video.title : video.id)
           let thumbnailName = baseName + '.jpg'
           let videoName = baseName + '.mp4'
-          try {
-            if (await stat(thumbnailName)) {
-            // FIXME: Actually generate unique files instead of just bailing out
-              console.log('Thumbnail exists:', baseName)
-              process.exit(1)
-            }
-          } catch (e) { }
-          try {
-            if (await stat(videoName)) {
-            // FIXME: Actually generate unique files instead of just bailing out
-              console.log('Video exists:', baseName)
-              process.exit(1)
-            }
-          } catch (e) { }
 
-          // Process the thumbnail
           let thumbnailPath = path.join(gamePath, thumbnailName)
-          log.debug(`Downloading thumbnail from ${video.thumbnail} to ${thumbnailPath}`)
-          await r2.get(video.thumbnail).response
-            .then(response => response.buffer())
-            .then(async buffer => {
-              await fs.writeFile(thumbnailPath, buffer)
-              log.debug('Wrote thumbnail to disk')
-            })
-
-          // Process the video
           let videoPath = path.join(gamePath, videoName)
-          log.debug(`Downloading video from ${video.url} to ${videoPath}`)
-          await r2.get(video.url).response
-            .then(response => response.buffer())
-            .then(async buffer => {
-              await fs.writeFile(videoPath, buffer)
-              log.debug('Wrote video to disk')
-            })
+          try {
+            if (await stat(thumbnailPath)) {
+            // FIXME: Actually generate unique files instead of just bailing out
+              log.debug('Thumbnail already exists:', thumbnailName)
+              // process.exit(1)
+            }
+          } catch (e) {
+            // Process the thumbnail
+            log.debug(`Downloading thumbnail from ${video.thumbnail} to ${thumbnailPath}`)
+            await r2.get(video.thumbnail).response
+              .then(response => response.buffer())
+              .then(async buffer => {
+                await writeFile(thumbnailPath, buffer)
+                log.debug('Wrote thumbnail to disk')
+              })
+          }
+          try {
+            if (await stat(videoPath)) {
+            // FIXME: Actually generate unique files instead of just bailing out
+              log.debug('Video already exists:', videoName)
+              // process.exit(1)
+            }
+          } catch (e) {
+            // Process the video
+            log.debug(`Downloading video from ${video.url} to ${videoPath}`)
+            await r2.get(video.url).response
+              .then(response => response.buffer())
+              .then(async buffer => {
+                await writeFile(videoPath, buffer)
+                log.debug('Wrote video to disk')
+              })
+          }
         }
 
         // TODO: Create the proper file and directory structure, so you're taking into consideration
