@@ -1,76 +1,40 @@
 const constants = require('../utils/constants')
 const log = require('../utils/log')
-
 const program = require('commander')
 const { prompt } = require('inquirer')
-
 const r2 = require('r2')
-const scrapeIt = require('scrape-it')
+const ForgeAPI = require('../api')
 
-// TODO: Refactor everything to their own files to separate logic as clearly as possible
-
-const download = async(username) => {
-  // TODO: Sanitize username to avoid any further issues (alphanumeric only?)
-
+const download = async (username) => {
   log.debug('Downloading clips from user:', username)
-
   let url = 'https://forge.gg/' + username
+  await r2(url).response
+    .then(response => response.text())
+    .then(async body => {
+      try {
+        let userId = body.match(constants.FORGE_USERID_REGEX)[1]
+        let api = new ForgeAPI(userId)
+        let result = await api.loadVideos()
 
-  // TODO: Could we potentially parse the React stuff to a JSON object?
-
-  // TODO:
-  //
-  // 1. Get an array of <div class="item-*">
-  // 2. Get item -> <div> -> <a href>
-  // 3. Open the link (format: https://forge.gg/Dids/VmlkZW86OTUxNTMy)
-  // 4. Get <source src>
-
-  // NOTE: Works
-  r2(url).response
-  .then(response => response.text())
-  .then(body => {
-    // log.debug('Body:', body)
-
-    // FIXME: Naturally this doesn't work and scrape-it doesn't seem to support
-    //        any fancy waiting/loading of content (scrolled content in this case)
-    let result = scrapeIt.scrapeHTML(body, {
-      videos: {
-        listItem: '.item-*',
-        data: {
-          url: {
-            listItem: 'div > a.href'
-          }
+        // TODO: Start downloading each video file to the local filesystem
+        for (let i in result.videos) {
+          let video = result.videos[i]
+          log.debug(`Downloading from ${video.url} to <TODO>`)
         }
+
+        // TODO: Create the proper file and directory structure, so you're taking into consideration
+        //       things like the game, author (username), id and title of the clip etc.
+
+        // TODO: If easily possible, create a HTML-file used for viewing the files, as there will be a lot of them..
+
+        log.debug('All done!')
+        process.exit(0)
+      } catch (err) {
+        log.error('Failed to download videos. Double-check your username and capitalization.\n')
+        log.error(err)
+        process.exit(1)
       }
     })
-    log.debug('Scrape result:', JSON.stringify(result, null, 2))
-  })
-
-  // NOTE: Works
-  /* let response = await r2(url, {
-    headers: {
-      'User-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4'
-    }
-  }).response
-  log.debug('Response:', response) */
-
-  // NOTE: Doesn't work
-  /* let html = await r2(url, {
-    headers: {
-      'User-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4'
-    }
-  }).text
-  log.debug('HTML:', html) */
-
-  // NOTE: Doesn't work
-  /* await scrapeIt({
-    url: url,
-    headers: {
-      'User-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4'
-    }
-  }).then(page => {
-    log.debug('Page:', page)
-  }) */
 }
 
 // Custom help override function that adds color support etc.
@@ -97,25 +61,25 @@ program.usage('[options] <user>')
 
 // TODO: I'm not really sure if this is a good way to go about it, because arguments might be better, no?
 program
-.command('download [username]') // NOTE: <required> [optional]
+  .command('download [username]') // NOTE: <required> [optional]
 // .alias('d')
-.description('Download clips from a specific user')
-.action(async(username) => {
+  .description('Download clips from a specific user')
+  .action(async (username) => {
   // TODO: Come up with a good way to do input validation
   // TODO: Strip whitespaces and potentially any non alphanumeric characters?
-  if (!username) {
-    prompt({ type: 'input', name: 'username', message: 'Username to download from:' }).then(async(answers) => {
-      if (answers['username']) {
-        await download(answers.username)
-      } else {
-        log.error('Error: Username is required')
-        process.exit(1)
-      }
-    })
-  } else {
-    await download(username)
-  }
-})
+    if (!username) {
+      prompt({ type: 'input', name: 'username', message: 'Username to download from:' }).then(async (answers) => {
+        if (answers['username']) {
+          await download(answers.username)
+        } else {
+          log.error('Error: Username is required')
+          process.exit(1)
+        }
+      })
+    } else {
+      await download(username)
+    }
+  })
 
 // HACK: Override help
 program.option('-h, --help', 'output usage information', () => {

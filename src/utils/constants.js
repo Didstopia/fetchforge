@@ -8,5 +8,11 @@ module.exports = Object.freeze({
 
   // App constants
   APP_VERSION: pkg.version,
-  APP_DESCRIPTION: pkg.description
+  APP_DESCRIPTION: pkg.description,
+
+  // Misc. constants
+  FORGE_BASE: 'https://forge.gg',
+  FORGE_API_BASE: 'https://forge.gg/api',
+  // FORGE_USERID_REGEX: username => new RegExp(`/(?:.*)"id":"(.*)","username":"${username}"(?:.*)/`)
+  FORGE_USERID_REGEX: /(?:.*)\/avatars\/([0-9]+)(?:.*).png/
 })
