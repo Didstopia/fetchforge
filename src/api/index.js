@@ -1,5 +1,5 @@
 const constants = require('../utils/constants')
-const log = require('../utils/log')
+// const log = require('../utils/log')
 
 const r2 = require('r2')
 
