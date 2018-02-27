@@ -17,7 +17,7 @@ class API {
   }
 
   // TODO: Should we go for 25, 50 or 100 videos at a time?
-  async loadVideos (afterId = '', index = 0, count = 50) {
+  async loadVideos (afterId = '', index = 0, count = 1) {
     log.debug('Loading videos after id, at index and with count:', afterId, index, count)
 
     // Create the request body
@@ -34,7 +34,7 @@ class API {
     let response = await r2.post(constants.FORGE_API_BASE, { json: requestBody }).response
     // log.debug('Response:', JSON.stringify(response, null, 2))
     let json = await response.json()
-    log.debug('JSON:', JSON.stringify(json, null, 2))
+    // log.debug('JSON:', JSON.stringify(json, null, 2))
 
     let result = {
       afterId: afterId,
@@ -51,20 +51,20 @@ class API {
           },
           createdAt: item.node.createdAt,
           url: item.node.mp4,
-          thumbnail: item.node.thumbnail
+          thumbnail: item.node.thumbnail.indexOf('http') !== -1 ? item.node.thumbnail : 'https:' + item.node.thumbnail
         }
       })
     }
 
     // FIXME: Remove this hardcoded, debug specific limit
-    if (result.hasMore && index < 50) {
+    if (result.hasMore && index < count) {
       log.debug('More videos available, loading..')
       let moreResults = await this.loadVideos(result.lastId, index + count, count)
       moreResults.videos = result.videos.concat(moreResults.videos)
       result = moreResults
     }
 
-    // log.debug('Result:', JSON.stringify(result, null, 2))
+    log.debug('Result:', JSON.stringify(result, null, 2))
     log.debug('Total video count:', result.videos.length)
     return result
   }

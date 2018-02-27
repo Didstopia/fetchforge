@@ -42,6 +42,8 @@
     "colors": "^1.1.2",
     "commander": "^2.14.1",
     "inquirer": "^5.1.0",
-    "r2": "^2.0.0"
+    "r2": "^2.0.0",
+    "sanitize-filename": "^1.6.1",
+    "validator": "^9.4.1"
   }
 }
