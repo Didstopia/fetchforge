@@ -6,12 +6,9 @@
   "preferGlobal": true,
   "bin": "src/index.js",
   "scripts": {
-    "test": "standard | snazzy && mocha",
+    "test": "standard | snazzy && mocha && npm run package",
     "start": "node src/index.js",
     "package": "pkg ."
-  },
-  "pkg": {
-    "assets": "package.json"
   },
   "repository": {
     "type": "git",
@@ -38,6 +35,7 @@
   "devDependencies": {
     "mocha": "^5.0.1",
     "pkg": "^4.3.0",
+    "snazzy": "^7.0.0",
     "standard": "^11.0.0"
   },
   "dependencies": {

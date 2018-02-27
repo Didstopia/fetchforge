@@ -1,1 +1,14 @@
-# TODO
+language: node_js
+node_js: node
+cache:
+  directories:
+    - node_modules
+before_deploy: npm run package
+deploy:
+  provider: releases
+  api_key: ${GITHUB_OAUTH_TOKEN}
+  file_glob: true
+  file: fetchforge-*
+  skip_cleanup: true
+  on:
+    tags: true
