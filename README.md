@@ -1,5 +1,7 @@
 # fetchforge
 
+[![Build Status](https://travis-ci.org/Didstopia/fetchforge.svg?branch=master)](https://travis-ci.org/Didstopia/fetchforge)
+
 Fetchforge is a command line application for downloading clips from [forge.gg](https://forge.gg/).
 
 ## Installation
