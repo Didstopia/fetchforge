@@ -13,12 +13,12 @@ class API {
     // Store the userId
     this.userId = userId
 
-    log.debug('New API() constructed for userId:', userId)
+    // log.debug('New API() constructed for userId:', userId)
   }
 
   // TODO: We might want to go for 24 clips a a time, since that's the default for forge.gg
   async loadVideos (afterId = '', index = 0, count = 1) {
-    log.debug('Loading videos after id, at index and with count:', afterId, index, count)
+    // log.debug('Loading videos after id, at index and with count:', afterId, index, count)
 
     // Create the request body
     let requestBody = {
@@ -58,14 +58,14 @@ class API {
 
     // FIXME: Remove this hardcoded, debug specific limit
     if (result.hasMore && index < count) {
-      log.debug('More videos available, loading..')
+      // log.debug('More videos available, loading..')
       let moreResults = await this.loadVideos(result.lastId, index + count, count)
       moreResults.videos = result.videos.concat(moreResults.videos)
       result = moreResults
     }
 
     // log.debug('Result:', JSON.stringify(result, null, 2))
-    log.debug('Total video count:', result.videos.length)
+    // log.debug('Total video count:', result.videos.length)
     return result
   }
 }

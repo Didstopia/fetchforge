@@ -11,19 +11,30 @@ const stat = promisify(fs.stat)
 const mkdir = promisify(fs.mkdir)
 const writeFile = promisify(fs.writeFile)
 const sanitize = require('sanitize-filename')
+const Spinner = require('cli-spinner').Spinner
 const ForgeAPI = require('../api')
+
+// Set default spinner style
+// Spinner.setDefaultSpinnerString()
 
 const download = async (username) => {
   if (!validator.isAlphanumeric(username)) {
     log.error('Error: Invalid username')
     process.exit(1)
   }
+
   log.debug('Downloading clips from user:', username)
+
+  // Create and start a new spinner
+  let spinner = new Spinner('Warming up.. %s')
+  spinner.start()
+
   let url = 'https://forge.gg/' + username
   await r2(url).response
     .then(response => response.text())
     .then(async body => {
       try {
+        spinner.setSpinnerTitle('Listing clips.. %s')
         let userId = body.match(constants.FORGE_USERID_REGEX)[1]
         let api = new ForgeAPI(userId)
         let result = await api.loadVideos()
@@ -52,38 +63,52 @@ const download = async (username) => {
           let thumbnailName = baseName + '.jpg'
           let videoName = baseName + '.mp4'
 
+          spinner.setSpinnerTitle('Processing clip "' + baseName + '" .. %s')
+
           let thumbnailPath = path.join(gamePath, thumbnailName)
           let videoPath = path.join(gamePath, videoName)
           try {
             if (await stat(thumbnailPath)) {
             // FIXME: Actually generate unique files instead of just bailing out
+              spinner.stop(true)
               log.debug('Thumbnail already exists:', thumbnailName)
+              spinner.start()
               // process.exit(1)
             }
           } catch (e) {
             // Process the thumbnail
+            spinner.stop(true)
             log.debug(`Downloading thumbnail from ${video.thumbnail} to ${thumbnailPath}`)
+            spinner.start()
             await r2.get(video.thumbnail).response
               .then(response => response.buffer())
               .then(async buffer => {
                 await writeFile(thumbnailPath, buffer)
+                spinner.stop(true)
                 log.debug('Wrote thumbnail to disk')
+                spinner.start()
               })
           }
           try {
             if (await stat(videoPath)) {
             // FIXME: Actually generate unique files instead of just bailing out
+              spinner.stop(true)
               log.debug('Video already exists:', videoName)
+              spinner.start()
               // process.exit(1)
             }
           } catch (e) {
             // Process the video
+            spinner.stop(true)
             log.debug(`Downloading video from ${video.url} to ${videoPath}`)
+            spinner.start()
             await r2.get(video.url).response
               .then(response => response.buffer())
               .then(async buffer => {
                 await writeFile(videoPath, buffer)
+                spinner.stop(true)
                 log.debug('Wrote video to disk')
+                spinner.start()
               })
           }
         }
@@ -92,6 +117,8 @@ const download = async (username) => {
         //       things like the game, author (username), id and title of the clip etc.
 
         // TODO: If easily possible, create a HTML-file used for viewing the files, as there will be a lot of them..
+
+        spinner.stop(true)
 
         log.debug('All done!')
         process.exit(0)
