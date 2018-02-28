@@ -15,6 +15,8 @@ deploy:
     file_glob: true
     file: fetchforge-*
     skip_cleanup: true
+    on:
+      branch: development
   - provider: releases
     api_key: ${GITHUB_OAUTH_TOKEN}
     file_glob: true
