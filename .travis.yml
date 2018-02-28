@@ -10,7 +10,7 @@ before_deploy: npm run package
 deploy:
   - provider: s3
     access_key_id: ${ARTIFACTS_KEY}
-    secret_access_key: ${ARTIFACTS_SECRET}
+    secret_access_key: ${ARTIFACTS_SECRET}
     bucket: ${ARTIFACTS_BUCKET}
     file_glob: true
     file: fetchforge-*
