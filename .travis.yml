@@ -5,9 +5,9 @@ addons:
     s3_region: "eu-central-1"
     paths:
     - ${TRAVIS_BUILD_DIR}/fetchforge-*
-cache:
-  directories:
-    - node_modules
+#cache:
+#  directories:
+#    - node_modules
 before_deploy: npm run package
 deploy:
   provider: releases
