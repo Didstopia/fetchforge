@@ -6,7 +6,7 @@ addons:
   artifacts:
     s3_region: "eu-central-1"
     paths:
-    - ${TRAVIS_BUILD_DIR}/fetchforge-*
+      - $(ls ${TRAVIS_BUILD_DIR}/fetchforge-* | tr "\n" ":")
 cache:
   directories:
     - node_modules
