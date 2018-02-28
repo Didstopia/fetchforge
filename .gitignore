@@ -4,6 +4,7 @@
 fetchforge-*
 tmp/
 .pkg/
+build/
 
 ### dotenv ###
 .env
