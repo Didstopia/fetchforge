@@ -1,9 +1,8 @@
 # Created by https://www.gitignore.io/api/node,linux,macos,windows,visualstudiocode
 
-### Node.js pkg module ###
-fetchforge-linux
-fetchforge-macos
-fetchforge-win.exe
+### App specific ###
+fetchforge-*
+tmp/
 
 ### dotenv ###
 .env

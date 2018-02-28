@@ -1,5 +1,10 @@
 language: node_js
 node_js: node
+addons:
+  artifacts: true
+    s3_region: "eu-central-1"
+    paths:
+    - $TRAVIS_BUILD_DIR/fetchforge-*
 cache:
   directories:
     - node_modules

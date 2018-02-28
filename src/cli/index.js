@@ -10,12 +10,15 @@ const promisify = require('util').promisify
 const stat = promisify(fs.stat)
 const mkdir = promisify(fs.mkdir)
 const writeFile = promisify(fs.writeFile)
+const utimes = promisify(fs.utimes)
 const sanitize = require('sanitize-filename')
-const Spinner = require('cli-spinner').Spinner
 const ForgeAPI = require('../api')
 
-// Set default spinner style
-// Spinner.setDefaultSpinnerString()
+const CLI = require('clui')
+const CLC = require('cli-color')
+// const Line = CLI.Line
+const Progress = CLI.Progress
+const Spinner = CLI.Spinner
 
 const download = async (username) => {
   if (!validator.isAlphanumeric(username)) {
@@ -23,111 +26,112 @@ const download = async (username) => {
     process.exit(1)
   }
 
+  // Create a spinner
+  let spinner = new Spinner('Downloading clips..', ['◜', '◝', '◞', '◟'])
+
   log.debug('Downloading clips from user:', username)
 
-  // Create and start a new spinner
-  let spinner = new Spinner('Warming up.. %s')
+  let api = new ForgeAPI(username)
+  let result = await api.loadVideos()
+
+  // Start the spinner
   spinner.start()
 
-  let url = 'https://forge.gg/' + username
-  await r2(url).response
-    .then(response => response.text())
-    .then(async body => {
-      try {
-        spinner.setSpinnerTitle('Listing clips.. %s')
-        let userId = body.match(constants.FORGE_USERID_REGEX)[1]
-        let api = new ForgeAPI(userId)
-        let result = await api.loadVideos()
+  // Prepare global paths
+  let downloadPath = constants.DOWNLOAD_PATH
+  let userPath = path.join(downloadPath, username)
 
-        // Prepare the download path
-        let downloadPath = constants.DOWNLOAD_PATH
-        try { await stat(downloadPath) } catch (e) { await mkdir(downloadPath) }
+  // Start downloading each video file to the local filesystem
+  let index = 1 // This is technically not accurate but it does give the user some "inspiration"
+  for (let i in result.videos) {
+    // Get a reference to the video details
+    let video = result.videos[i]
 
-        // Make sure a folder exists per user
-        let userPath = path.join(downloadPath, username)
-        try { await stat(userPath) } catch (e) { await mkdir(userPath) }
+    // Update the spinner
+    spinner.message(`Downloading clip ${index} out of ${result.videos.length} (total progress: ${index / result.videos.length * 100}%)`)
 
-        // TODO: Start downloading each video file to the local filesystem
-        for (let i in result.videos) {
-          let video = result.videos[i]
+    // Make sure the correct folder structure exists
+    let gamePath = path.join(userPath, video.game.slug)
+    try { await stat(downloadPath) } catch (e) { await mkdir(downloadPath) }
+    try { await stat(userPath) } catch (e) { await mkdir(userPath) }
+    try { await stat(gamePath) } catch (e) { await mkdir(gamePath) }
 
-          // Make sure a folder exists per game
-          let gamePath = path.join(userPath, video.game.slug)
-          try { await stat(gamePath) } catch (e) { await mkdir(gamePath) }
+    // Create a Date() object from the video creation date string
+    let videoCreationDate = new Date(video.createdAt)
 
-          // TODO: Could we potentially set the "creation" dates from the "createdAt" property instead?
+    // TODO: Could we potentially set the "creation" dates from the "createdAt" property instead?
 
-          // FIXME: This doesn't seem to properly validate whether the files already exist or not?
-          // Create a unique name for the video
-          let baseName = sanitize(video.title ? video.title : video.id)
-          let thumbnailName = baseName + '.jpg'
-          let videoName = baseName + '.mp4'
+    // FIXME: This doesn't seem to properly validate whether the files already exist or not?
+    // Create a unique name for the video
+    let baseName = sanitize(video.title ? video.title : `Untitled_${video.id}`).replace(/\s/g, '_')
+    let thumbnailName = baseName + '.jpg'
+    let videoName = baseName + '.mp4'
+    let jsonName = baseName + '.json'
 
-          spinner.setSpinnerTitle('Processing clip "' + baseName + '" .. %s')
-
-          let thumbnailPath = path.join(gamePath, thumbnailName)
-          let videoPath = path.join(gamePath, videoName)
-          try {
-            if (await stat(thumbnailPath)) {
-            // FIXME: Actually generate unique files instead of just bailing out
-              spinner.stop(true)
-              log.debug('Thumbnail already exists:', thumbnailName)
-              spinner.start()
-              // process.exit(1)
-            }
-          } catch (e) {
-            // Process the thumbnail
-            spinner.stop(true)
-            log.debug(`Downloading thumbnail from ${video.thumbnail} to ${thumbnailPath}`)
-            spinner.start()
-            await r2.get(video.thumbnail).response
-              .then(response => response.buffer())
-              .then(async buffer => {
-                await writeFile(thumbnailPath, buffer)
-                spinner.stop(true)
-                log.debug('Wrote thumbnail to disk')
-                spinner.start()
-              })
-          }
-          try {
-            if (await stat(videoPath)) {
-            // FIXME: Actually generate unique files instead of just bailing out
-              spinner.stop(true)
-              log.debug('Video already exists:', videoName)
-              spinner.start()
-              // process.exit(1)
-            }
-          } catch (e) {
-            // Process the video
-            spinner.stop(true)
-            log.debug(`Downloading video from ${video.url} to ${videoPath}`)
-            spinner.start()
-            await r2.get(video.url).response
-              .then(response => response.buffer())
-              .then(async buffer => {
-                await writeFile(videoPath, buffer)
-                spinner.stop(true)
-                log.debug('Wrote video to disk')
-                spinner.start()
-              })
-          }
-        }
-
-        // TODO: Create the proper file and directory structure, so you're taking into consideration
-        //       things like the game, author (username), id and title of the clip etc.
-
-        // TODO: If easily possible, create a HTML-file used for viewing the files, as there will be a lot of them..
-
-        spinner.stop(true)
-
-        log.debug('All done!')
-        process.exit(0)
-      } catch (err) {
-        log.error('Error: Failed to download videos\nCheck your username\n')
-        log.error(err)
-        process.exit(1)
+    let thumbnailPath = path.join(gamePath, thumbnailName)
+    let videoPath = path.join(gamePath, videoName)
+    let jsonPath = path.join(gamePath, jsonName)
+    try {
+      if (await stat(thumbnailPath)) {
+        // FIXME: Actually generate unique files instead of just bailing out
+        log.debug('Thumbnail already exists:', thumbnailName)
+        // process.exit(1)
       }
-    })
+    } catch (e) {
+      // Process the thumbnail
+      log.debug(`Downloading thumbnail from ${video.thumbnail} to ${thumbnailPath}`)
+      await r2.get(video.thumbnail).response
+        .then(response => response.buffer())
+        .then(async buffer => {
+          await writeFile(thumbnailPath, buffer)
+          await utimes(thumbnailPath, videoCreationDate, videoCreationDate)
+          log.debug('Wrote thumbnail to disk:', thumbnailName)
+        })
+    }
+    try {
+      if (await stat(videoPath)) {
+        // FIXME: Actually generate unique files instead of just bailing out
+        log.debug('Video already exists:', videoName)
+        // process.exit(1)
+      }
+    } catch (e) {
+      // Process the video
+      log.debug(`Downloading video from ${video.url} to ${videoPath}`)
+      await r2.get(video.url).response
+        .then(response => response.buffer())
+        .then(async buffer => {
+          await writeFile(videoPath, buffer)
+          await utimes(videoPath, videoCreationDate, videoCreationDate)
+          log.debug('Wrote video to disk:', videoName)
+        })
+    }
+    try {
+      if (await stat(jsonPath)) {
+        // FIXME: Actually generate unique files instead of just bailing out
+        log.debug('JSON already exists:', jsonName)
+        // process.exit(1)
+      }
+    } catch (e) {
+      // Process the JSON
+      await writeFile(jsonPath, JSON.stringify(video, null, 2))
+      await utimes(jsonPath, videoCreationDate, videoCreationDate)
+      log.debug('Wrote JSON to disk:', jsonName)
+    }
+
+    // Increment the index
+    index++
+  }
+
+  // TODO: Create the proper file and directory structure, so you're taking into consideration
+  //       things like the game, author (username), id and title of the clip etc.
+
+  // TODO: If easily possible, create a HTML-file used for viewing the files, as there will be a lot of them..
+
+  // Stop the spinner
+  spinner.stop()
+
+  log.debug('All done!')
+  process.exit(0)
 }
 
 // Custom help override function that adds color support etc.
