@@ -11,9 +11,9 @@ const persistCache = require('apollo-cache-persist').persistCache
 const gql = require('graphql-tag')
 
 const CLI = require('clui')
-const CLC = require('cli-color')
+// const CLC = require('cli-color')
 // const Line = CLI.Line
-const Progress = CLI.Progress
+// const Progress = CLI.Progress
 const Spinner = CLI.Spinner
 
 class API {

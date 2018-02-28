@@ -15,9 +15,9 @@ const sanitize = require('sanitize-filename')
 const ForgeAPI = require('../api')
 
 const CLI = require('clui')
-const CLC = require('cli-color')
+// const CLC = require('cli-color')
 // const Line = CLI.Line
-const Progress = CLI.Progress
+// const Progress = CLI.Progress
 const Spinner = CLI.Spinner
 
 const download = async (username) => {
