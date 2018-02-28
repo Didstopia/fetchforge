@@ -2,22 +2,23 @@ language: node_js
 node_js: node
 env:
   - PKG_CACHE_PATH=${TRAVIS_BUILD_DIR}/.pkg
-addons:
-  artifacts:
-    paths:
-      - $(ls ${TRAVIS_BUILD_DIR}/fetchforge-* | tr "\n" ":")
-    target_paths:
-      - /travis-ci/${TRAVIS_REPO_SLUG}/${TRAVIS_BUILD_NUMBER}/${TRAVIS_JOB_NUMBER}
 cache:
   directories:
     - node_modules
     - ${PKG_CACHE_PATH}
 before_deploy: npm run package
 deploy:
-  provider: releases
-  api_key: ${GITHUB_OAUTH_TOKEN}
-  file_glob: true
-  file: fetchforge-*
-  skip_cleanup: true
-  on:
-    tags: true
+  - provider: s3
+    access_key_id: ${ARTIFACTS_KEY}
+    secret_access_key: ${ARTIFACTS_SECRET}
+    bucket: ${ARTIFACTS_BUCKET}
+    file_glob: true
+    file: fetchforge-*
+    skip_cleanup: true
+  - provider: releases
+    api_key: ${GITHUB_OAUTH_TOKEN}
+    file_glob: true
+    file: fetchforge-*
+    skip_cleanup: true
+    on:
+      tags: true
