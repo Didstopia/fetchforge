@@ -3,6 +3,7 @@
 ### App specific ###
 fetchforge-*
 tmp/
+.pkg/
 
 ### dotenv ###
 .env

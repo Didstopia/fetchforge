@@ -8,7 +8,7 @@
   "scripts": {
     "test": "standard | snazzy && mocha && npm run package",
     "start": "node src/index.js",
-    "package": "rm -f fetchforge-* && pkg ."
+    "package": "rm -f fetchforge-* && pkg . && ls fetchforge-*"
   },
   "pkg": {
     "targets": [

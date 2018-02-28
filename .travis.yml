@@ -1,13 +1,16 @@
 language: node_js
 node_js: node
+env:
+  - PKG_CACHE_PATH=${TRAVIS_BUILD_DIR}/.pkg
 addons:
   artifacts:
     s3_region: "eu-central-1"
     paths:
     - ${TRAVIS_BUILD_DIR}/fetchforge-*
-#cache:
-#  directories:
-#    - node_modules
+cache:
+  directories:
+    - node_modules
+    - ${PKG_CACHE_PATH}
 before_deploy: npm run package
 deploy:
   provider: releases
