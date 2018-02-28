@@ -13,9 +13,7 @@
   "pkg": {
     "targets": [
       "macos-x64",
-      "win-x86",
       "win-x64",
-      "linux-x86",
       "linux-x64"
     ]
   },
