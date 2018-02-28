@@ -4,7 +4,6 @@ env:
   - PKG_CACHE_PATH=${TRAVIS_BUILD_DIR}/.pkg
 addons:
   artifacts:
-    s3_region: "eu-central-1"
     paths:
       - $(ls ${TRAVIS_BUILD_DIR}/fetchforge-* | tr "\n" ":")
     target_paths:
