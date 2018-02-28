@@ -9,16 +9,16 @@ cache:
 before_deploy: npm run package
 deploy:
   - provider: s3
-    access_key_id: ${ARTIFACTS_KEY}
-    secret_access_key: ${ARTIFACTS_SECRET}
-    bucket: ${ARTIFACTS_BUCKET}
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    bucket: $AWS_BUCKET
     file_glob: true
     file: fetchforge-*
     skip_cleanup: true
     on:
       branch: development
   - provider: releases
-    api_key: ${GITHUB_OAUTH_TOKEN}
+    api_key: $GITHUB_OAUTH_TOKEN
     file_glob: true
     file: fetchforge-*
     skip_cleanup: true
