@@ -4,11 +4,11 @@
   "description": "A command line application for downloading clips from forge.gg",
   "main": "src/index.js",
   "preferGlobal": true,
-  "bin": "src/index.js",
+  "bin": "pkg.js",
   "scripts": {
     "test": "standard | snazzy && mocha && npm run package",
     "start": "node src/index.js",
-    "package": "mkdir -p build && cd build && rm -f fetchforge-* && pkg ../ && ls fetchforge-*"
+    "package": "mkdir -p build && cd build && rm -f fetchforge-* && pkg ../package.json && ls fetchforge-*"
   },
   "pkg": {
     "targets": [
