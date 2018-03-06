@@ -31,8 +31,21 @@ const download = async (username) => {
 
   log.debug('Downloading clips from user:', username)
 
+  // Keep track of the start time
+  let startTime = process.hrtime()
+
+  let parseHrtimeToSeconds = hrtime => {
+    var seconds = (hrtime[0] + (hrtime[1] / 1e9)).toFixed(3)
+    return seconds
+  }
+
   let api = new ForgeAPI(username)
   let result = await api.loadVideos()
+
+  log.debug(`Got a list of ${result.videos.length}/${result.total} videos!`)
+
+  let apiListExecTime = parseHrtimeToSeconds(process.hrtime(startTime))
+  log.debug(`Listing videos took ${apiListExecTime} seconds!`)
 
   // Start the spinner
   spinner.start()
@@ -48,7 +61,7 @@ const download = async (username) => {
     let video = result.videos[i]
 
     // Update the spinner
-    spinner.message(`Downloading clip ${index} out of ${result.videos.length} (total progress: ${index / result.videos.length * 100}%)`)
+    spinner.message(`Downloading clip ${index} out of ${result.videos.length} (total progress: ${parseInt(index / result.videos.length * 100)}%)`)
 
     // Make sure the correct folder structure exists
     let gamePath = path.join(userPath, video.game.slug)
@@ -59,11 +72,10 @@ const download = async (username) => {
     // Create a Date() object from the video creation date string
     let videoCreationDate = new Date(video.createdAt)
 
-    // TODO: Could we potentially set the "creation" dates from the "createdAt" property instead?
-
-    // FIXME: This doesn't seem to properly validate whether the files already exist or not?
+    // FIXME: If a file exists (title may be the same), we need to handle that gracefully,
+    //        but we also need to handle skippin already downloaded files (append ID to file or just use IDs in the first place?)
     // Create a unique name for the video
-    let baseName = sanitize(video.title ? video.title : `Untitled_${video.id}`).replace(/\s/g, '_')
+    let baseName = sanitize(video.title ? video.title : `Untitled_${video.id}`).replace(/\s/g, '_') // FIXME: This doesn't strip quotes for instance..
     let thumbnailName = baseName + '.jpg'
     let videoName = baseName + '.mp4'
     let jsonName = baseName + '.json'

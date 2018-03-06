@@ -47,10 +47,8 @@ class API {
     // log.debug('New API() constructed for username:', username)
   }
 
-  // TODO: Use the "totalCount" or "videoCount" properties to calculate progress percentages etc.
-  // TODO: We might want to go for 24 clips a a time, since that's the default for forge.gg
-  async loadVideos (cursor = '', index = 0, count = 1) {
-    log.debug('Loading videos with cursor, index and count:', cursor, index, count)
+  async loadVideos (cursor = '', index = 0, count = 24) {
+    // log.debug('Loading videos with cursor, index and count:', cursor, index, count)
 
     // this.spinner.message(`Listing clips.. ${index}/${}`)
 
@@ -114,7 +112,7 @@ class API {
           total: response.data.user._videos20YgKr.totalCount
         }
 
-        this.spinner.message(`Listing clips.. ${index}/${result.total}`)
+        this.spinner.message(`Listing clips.. ${parseInt((index + count) / result.total * 100)}% (${index + count}/${result.total})`)
 
         // Bail early if there are no videos
         if (!result.videos.length) {
@@ -123,8 +121,8 @@ class API {
         }
 
         // Check if we need to process more results
-        if (response.data.user._videos20YgKr.pageInfo.hasNextPage && index < 4) { // FIXME: Remove the index check, it's for debugging only!
-          log.debug(`Loading more results.. (${result.total} clips total)`)
+        if (response.data.user._videos20YgKr.pageInfo.hasNextPage) {
+          // log.debug(`Loading more results.. (${result.total} clips total)`)
 
           // Load more results (recursively)
           let moreResults = await this.loadVideos(response.data.user._videos20YgKr.pageInfo.endCursor, index + count, count)
