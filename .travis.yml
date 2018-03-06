@@ -2,11 +2,15 @@ language: node_js
 node_js: node
 env:
   - PKG_CACHE_PATH=${TRAVIS_BUILD_DIR}/.pkg
+  - BUILD_PATH=${TRAVIS_BUILD_DIR}/build/${TRAVIS_REPO_SLUG}/${TRAVIS_BUILD_NUMBER}/${TRAVIS_JOB_NUMBER}
 cache:
   directories:
     - node_modules
     - ${PKG_CACHE_PATH}
-before_deploy: npm run package
+before_deploy:
+  - mkdir -p ${BUILD_PATH}
+  - npm run package
+  - mv ${TRAVIS_BUILD_DIR}/build/fetchforge-* ${BUILD_PATH}/
 deploy:
   - provider: s3
     access_key_id: $AWS_ACCESS_KEY_ID
