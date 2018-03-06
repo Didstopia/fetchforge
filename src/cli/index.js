@@ -75,7 +75,7 @@ const download = async (username) => {
     // FIXME: If a file exists (title may be the same), we need to handle that gracefully,
     //        but we also need to handle skippin already downloaded files (append ID to file or just use IDs in the first place?)
     // Create a unique name for the video
-    let baseName = sanitize(video.title ? video.title : `Untitled_${video.id}`).replace(/\s/g, '_') // FIXME: This doesn't strip quotes for instance..
+    let baseName = sanitize(video.title ? `${video.title}_${video.id}` : `Untitled_${video.id}`).replace(/\s/g, '_') // FIXME: This doesn't strip quotes for instance..
     let thumbnailName = baseName + '.jpg'
     let videoName = baseName + '.mp4'
     let jsonName = baseName + '.json'
