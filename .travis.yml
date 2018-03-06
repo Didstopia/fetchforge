@@ -9,9 +9,10 @@ cache:
     - node_modules
     - ${PKG_CACHE_PATH}
 before_deploy:
-  - mkdir -p ${BUILD_PATH}
+  - mkdir -p "${BUILD_PATH}""
   - npm run package
-  - mv ${TRAVIS_BUILD_DIR}/build/fetchforge-* ${BUILD_PATH}/
+  - find "${TRAVIS_BUILD_DIR}/build" -name 'fetchforge-*' -print -exec zip '{}'.zip '{}' \; -exec rm -f '{}' \;
+  - mv "${TRAVIS_BUILD_DIR}/build/fetchforge-*.zip" "${BUILD_PATH}/"
 deploy:
   - provider: s3
     access_key_id: $AWS_ACCESS_KEY_ID
