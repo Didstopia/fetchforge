@@ -1,4 +1,4 @@
-// A simple wrapper for pkg, so we can easily pass NODE_ENV to the application itself
+#!/usr/bin/env node
 
 process.env.NODE_ENV = 'production'
 require('./src')

@@ -10,12 +10,10 @@ const InMemoryCache = require('apollo-cache-inmemory').InMemoryCache
 const persistCache = require('apollo-cache-persist').persistCache
 const gql = require('graphql-tag')
 
-const CLI = require('clui')
-// const CLC = require('cli-color')
-// const Line = CLI.Line
-// const Progress = CLI.Progress
-const Spinner = CLI.Spinner
+const clui = require('clui')
+const Spinner = clui.Spinner
 
+// Create a new API class
 class API {
   constructor (username) {
     // Validate the username
@@ -116,6 +114,7 @@ class API {
 
         // Bail early if there are no videos
         if (!result.videos.length) {
+          this.spinner.stop()
           log.error(`Error: No clips were found for user "${this.username}"`)
           process.exit(1)
         }
@@ -139,6 +138,7 @@ class API {
       })
       .catch(error => {
         // Bail out if GraphQL throws errors
+        this.spinner.stop()
         log.debug('GraphQL query failed:', JSON.stringify(error))
         log.error(`Error: An unknown error occurred (perhaps user "${this.username}" doesn't exist?)`)
         process.exit(1)
@@ -146,4 +146,5 @@ class API {
   }
 }
 
+// Export the class itself
 module.exports = API
