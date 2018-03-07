@@ -1,5 +1,7 @@
 # fetchforge
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/Didstopia/fetchforge.svg)](https://greenkeeper.io/)
+
 Fetchforge is a command line application for downloading clips from [forge.gg](https://forge.gg/).
 
 ## Installation
