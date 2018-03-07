@@ -10,7 +10,7 @@
   "scripts": {
     "test": "standard | snazzy && mocha && npm run package",
     "start": "node src/index.js",
-    "package": "mkdir build && cd build && pkg ../package.json"
+    "package": "mkdir -p build && cd build && rm -f fetchforge-* && pkg ../package.json && ls fetchforge-*"
   },
   "pkg": {
     "targets": [
