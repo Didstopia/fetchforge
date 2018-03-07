@@ -1,24 +1,35 @@
 # fetchforge
 
 [![Build Status](https://travis-ci.org/Didstopia/fetchforge.svg?branch=master)](https://travis-ci.org/Didstopia/fetchforge)
+[![Greenkeeper badge](https://badges.greenkeeper.io/Didstopia/fetchforge.svg)](https://greenkeeper.io/)
 
 Fetchforge is a command line application for downloading clips from [forge.gg](https://forge.gg/).
 
 ## Installation
 
-_TODO_
+See [Releases](https://github.com/Didstopia/fetchforge/releases) for the latest versions.
 
 ## Usage (Simple)
 
-_TODO_
+Run interactively by running without any arguments:
+
+> fetchforge
+
+You can also specify parameters manually (username is the only required parameter):
+
+> fetchforge Dids
 
 ## Usage (Advanced)
 
-_TODO_
+To see a list of options:
+
+> fetchforge --help
+
+Run with verbose logging, override download path and set the username:
+
+> fetchforge --verbose --path ~/Downloads Dids
 
 ## Development
-
-_WIP_
 
 ```sh
 npm i
