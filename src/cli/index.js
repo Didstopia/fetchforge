@@ -25,13 +25,46 @@ class CLI {
   async handleArgs (args) {
     log.debug('handleArgs:', JSON.stringify(args, null, 2))
 
-    // FIXME: We still need support for overriding the download path!
+    // FIXME: We need to properly test against edgecases,
+    //        where users might be doing arguments in random order..
+
+    let pathOverride
+    if (args.includes('-p') || args.includes('--path')) {
+      pathOverride = args[args.indexOf('-p') !== -1 ? args.indexOf('-p') + 1 : args.indexOf('--path') + 1]
+
+      // Normalize and resolve the path
+      log.debug('Path override:', pathOverride)
+      pathOverride = path.normalize(pathOverride)
+      log.debug('Path override (normalized):', pathOverride)
+      pathOverride = path.resolve(pathOverride)
+      log.debug('Path override (resolved):', pathOverride)
+
+      // Validate the extra path argument
+      if (!pathOverride) {
+        log.error('Error: Missing path (path argument requires a path)')
+        process.exit(1)
+      }
+
+      // Validate that the path exists
+      try {
+        if (await stat(pathOverride)) {
+          log.debug('Override path exists, continuing..')
+        }
+      } catch (e) {
+        log.error('Error: Invalid path specified (make sure it exists first)')
+        process.exit(1)
+      }
+
+      // Remove the path arguments, as we don't need them anymore
+      if (args.indexOf('-p') !== -1) args.splice(args.indexOf('-p'), 2)
+      if (args.indexOf('--path') !== -1) args.splice(args.indexOf('--path'), 2)
+    }
 
     // Handle different arguments
     if (args.length === 1) {
       // If we have exactly 1 argument, we can use that as the username
       log.debug('Enabling non-interactive mode')
-      await download(args[0])
+      await download(args[0], pathOverride)
     } else if (args.length > 1) {
       // If we have more than 1 argument, we just bail out
       log.error('Error: Too many arguments')
@@ -48,7 +81,7 @@ class CLI {
 // Export the class itself
 module.exports = CLI
 
-const download = async (username) => {
+const download = async (username, pathOverride) => {
   if (!validator.isAlphanumeric(username)) {
     log.error('Error: Invalid username')
     process.exit(1)
@@ -79,8 +112,10 @@ const download = async (username) => {
   spinner.start()
 
   // Prepare global paths
-  let downloadPath = constants.DOWNLOAD_PATH
+  let downloadPath = path.join(pathOverride || constants.DOWNLOAD_PATH, 'fetchforge')
   let userPath = path.join(downloadPath, username)
+
+  log.debug('Base download path:', downloadPath)
 
   // Start downloading each video file to the local filesystem
   let index = 1 // This is technically not accurate but it does give the user some "inspiration"

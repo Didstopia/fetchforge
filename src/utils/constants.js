@@ -18,5 +18,5 @@ module.exports = Object.freeze({
   FORGE_USERID_REGEX: /(?:.*)\/avatars\/([0-9]+)(?:.*).png/,
 
   // Platform constants
-  DOWNLOAD_PATH: path.join(process.platform === 'win32' ? process.env.HOMEPATH : process.env.HOME, 'Downloads', 'fetchforge')
+  DOWNLOAD_PATH: path.join(process.platform === 'win32' ? process.env.HOMEPATH : process.env.HOME, 'Downloads')
 })
