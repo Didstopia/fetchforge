@@ -1,1 +1,32 @@
-# TODO
+language: node_js
+node_js: node
+env:
+  global:
+    - PKG_CACHE_PATH=${TRAVIS_BUILD_DIR}/.pkg
+    - BUILD_PATH=${TRAVIS_BUILD_DIR}/build/${TRAVIS_REPO_SLUG}/${TRAVIS_BUILD_NUMBER}/${TRAVIS_JOB_NUMBER}
+cache:
+  directories:
+    - node_modules
+    - ${PKG_CACHE_PATH}
+before_deploy:
+  - mkdir -p ${BUILD_PATH}
+  - npm run package
+  - find ${TRAVIS_BUILD_DIR}/build -name 'fetchforge-*' -print -exec zip -j '{}'.zip '{}' \; -exec rm -f '{}' \;
+  - mv ${TRAVIS_BUILD_DIR}/build/fetchforge-*.zip ${BUILD_PATH}/
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    bucket: $AWS_BUCKET
+    acl: public_read
+    local_dir: build
+    skip_cleanup: true
+    on:
+      branch: development
+  - provider: releases
+    api_key: $GITHUB_OAUTH_TOKEN
+    file_glob: true
+    file: fetchforge-*
+    skip_cleanup: true
+    on:
+      tags: true

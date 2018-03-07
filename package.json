@@ -3,8 +3,21 @@
   "version": "0.1.0",
   "description": "A command line application for downloading clips from forge.gg",
   "main": "src/index.js",
+  "preferGlobal": true,
+  "bin": {
+    "fetchforge": "pkg.js"
+  },
   "scripts": {
-    "test": "mocha"
+    "test": "standard | snazzy && mocha && npm run package",
+    "start": "node src/index.js",
+    "package": "mkdir -p build && cd build && rm -f fetchforge-* && pkg ../package.json && ls fetchforge-*"
+  },
+  "pkg": {
+    "targets": [
+      "macos-x64",
+      "win-x64",
+      "linux-x64"
+    ]
   },
   "repository": {
     "type": "git",
@@ -27,5 +40,26 @@
   "bugs": {
     "url": "https://github.com/Didstopia/fetchforge/issues"
   },
-  "homepage": "https://github.com/Didstopia/fetchforge#readme"
+  "homepage": "https://github.com/Didstopia/fetchforge#readme",
+  "devDependencies": {
+    "mocha": "^5.0.3",
+    "pkg": "^4.3.0",
+    "snazzy": "7.0.0",
+    "standard": "^11.0.0"
+  },
+  "dependencies": {
+    "ajv": "^6.2.1",
+    "apollo-cache-persist": "^0.1.1",
+    "apollo-client-preset": "^1.0.8",
+    "clui": "^0.3.6",
+    "colors": "^1.1.2",
+    "figlet": "^1.2.0",
+    "graphql": "^0.12.3",
+    "graphql-tag": "^2.8.0",
+    "inquirer": "^5.1.0",
+    "r2": "^2.0.0",
+    "redux-persist-node-storage": "^2.0.0",
+    "sanitize-filename": "^1.6.1",
+    "validator": "^9.4.1"
+  }
 }
