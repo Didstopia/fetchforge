@@ -36,6 +36,7 @@ if (args.length) {
     log.help('  Usage: fetchforge [username]')
     log.help('')
     log.help('  Options:')
+    log.help('    -p / --path (override download path)')
     log.help('    -h / --help (show this help screen')
     log.help('    -v / --verbose (enable verbose logging)')
     log.help('    -V / --version (show version information)')
