@@ -1,5 +1,13 @@
 #!/usr/bin/env node
 
+// Setup graceful shutdown
+const shutdown = () => {
+  log.info('Exiting..')
+  process.exit(0)
+}
+process.on('SIGTERM', shutdown)
+process.on('SIGINT', shutdown)
+
 // Parse normalized arguments
 let args = process.argv.slice(2)
 if (args.length) {
