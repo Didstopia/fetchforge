@@ -1,7 +1,8 @@
 const constants = require('../utils/constants')
 const log = require('../utils/log')
 
-const os = require('os')
+const path = require('path')
+// const os = require('os')
 
 const ApolloClient = require('apollo-client-preset').ApolloClient
 const HttpLink = require('apollo-link-http').HttpLink
@@ -15,7 +16,7 @@ const Spinner = clui.Spinner
 
 // Create a new API class
 class API {
-  constructor (username) {
+  constructor (username, pathOverride) {
     // Validate the username
     if (!username) {
       throw new Error('No username specified')
@@ -28,7 +29,7 @@ class API {
     let cache = new InMemoryCache()
     persistCache({
       cache: cache,
-      storage: new AsyncNodeStorage(constants.IS_DEBUG ? './tmp' : os.tmpdir()),
+      storage: new AsyncNodeStorage(path.join(pathOverride || constants.DOWNLOAD_PATH, 'fetchforge', '.cache')),
       maxSize: false
     })
 

@@ -2,6 +2,7 @@
 
 // Setup graceful shutdown
 const shutdown = () => {
+  log.info('')
   log.info('Exiting..')
   process.exit(0)
 }

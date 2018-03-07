@@ -100,7 +100,7 @@ const download = async (username, pathOverride) => {
     return seconds
   }
 
-  let api = new ForgeAPI(username)
+  let api = new ForgeAPI(username, pathOverride)
   let result = await api.loadVideos()
 
   log.debug(`Got a list of ${result.videos.length}/${result.total} videos!`)
