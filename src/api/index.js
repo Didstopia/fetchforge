@@ -11,6 +11,8 @@ const InMemoryCache = require('apollo-cache-inmemory').InMemoryCache
 const persistCache = require('apollo-cache-persist').persistCache
 const gql = require('graphql-tag')
 
+const mkdirp = require('mkdir-recursive').mkdirSync
+
 const clui = require('clui')
 const Spinner = clui.Spinner
 
@@ -26,10 +28,12 @@ class API {
     this.username = username
 
     // Setup caching
+    let cachePath = path.join(pathOverride || constants.DOWNLOAD_PATH, 'fetchforge', '.cache')
+    mkdirp(cachePath)
     let cache = new InMemoryCache()
     persistCache({
       cache: cache,
-      storage: new AsyncNodeStorage(path.join(pathOverride || constants.DOWNLOAD_PATH, 'fetchforge', '.cache')),
+      storage: new AsyncNodeStorage(path.join(pathOverride || cachePath)),
       maxSize: false
     })
 

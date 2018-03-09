@@ -60,6 +60,7 @@
     "graphql": "^0.12.3",
     "graphql-tag": "^2.8.0",
     "inquirer": "^5.1.0",
+    "mkdir-recursive": "^0.4.0",
     "r2": "^2.0.0",
     "redux-persist-node-storage": "^2.0.0",
     "sanitize-filename": "^1.6.1",
