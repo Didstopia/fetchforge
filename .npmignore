@@ -5,3 +5,4 @@ fetchforge-*
 build/
 .nyc_output/
 coverage/
+tmp/

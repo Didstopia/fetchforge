@@ -18,6 +18,7 @@ describe('App', () => {
       let line = 'Hello from Mocha'
       testLogLevel('help', line)
       testLogLevel('debug', line)
+      testLogLevel('verbose', line)
       testLogLevel('info', line)
       testLogLevel('warning', line)
       testLogLevel('error', line)

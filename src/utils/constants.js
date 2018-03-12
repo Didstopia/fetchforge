@@ -5,6 +5,7 @@ module.exports = Object.freeze({
   // Environment constants
   ENVIRONMENT: process.env.NODE_ENV || 'development',
   IS_DEBUG: !process.env.NODE_ENV || process.env.NODE_ENV === 'development',
+  IS_VERBOSE: process.env.NODE_ENV === 'verbose',
   IS_RELEASE: process.env.NODE_ENV === 'production',
 
   // App constants

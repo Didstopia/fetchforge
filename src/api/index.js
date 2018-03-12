@@ -51,7 +51,7 @@ class API {
   }
 
   async loadVideos (cursor = '', index = 0, count = 24, limit = -1) {
-    // log.debug('Loading videos with cursor, index and count:', cursor, index, count)
+    log.debug('Loading videos with cursor, index, count and limit:', cursor, index, count, limit)
 
     // this.spinner.message(`Listing clips.. ${index}/${}`)
 
@@ -124,8 +124,9 @@ class API {
         }
 
         // Check if we need to process more results
-        if (response.data.user._videos20YgKr.pageInfo.hasNextPage && (limit !== -1 && index + count < limit)) {
-          // log.debug(`Loading more results.. (${result.total} clips total)`)
+        let resultsLimited = limit !== -1 && index + count >= limit
+        if (response.data.user._videos20YgKr.pageInfo.hasNextPage && !resultsLimited) {
+          log.debug(`Loading more results.. (${result.total} clips total)`)
 
           // Load more results (recursively)
           let moreResults = await this.loadVideos(response.data.user._videos20YgKr.pageInfo.endCursor, index + count, count, limit)
