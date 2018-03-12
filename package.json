@@ -8,8 +8,9 @@
     "fetchforge": "pkg.js"
   },
   "scripts": {
-    "test": "standard | snazzy && mocha && npm run package",
     "start": "node src/index.js",
+    "codecov": "codecov",
+    "test": "standard | snazzy && nyc mocha --timeout=5000",
     "package": "mkdir -p build && cd build && rm -f fetchforge-* && pkg ../package.json && ls fetchforge-*"
   },
   "pkg": {
@@ -20,6 +21,26 @@
     ],
     "assets": [
       "node_modules/figlet/fonts/*"
+    ]
+  },
+  "nyc": {
+    "check-coverage": false,
+    "per-file": false,
+    "all": false,
+    "lines": 75,
+    "cache": true,
+    "reporter": [
+      "lcov",
+      "text"
+    ],
+    "exclude": [
+      "**/*.spec.js",
+      "coverage/**",
+      "test/**",
+      "test{,-*}.js",
+      "**/*.test.js",
+      "**/__tests__/**",
+      "**/node_modules/**"
     ]
   },
   "repository": {
@@ -44,8 +65,14 @@
     "url": "https://github.com/Didstopia/fetchforge/issues"
   },
   "homepage": "https://github.com/Didstopia/fetchforge#readme",
+  "engines": {
+    "node": ">=8"
+  },
   "devDependencies": {
+    "chai": "^4.1.2",
+    "codecov": "^3.0.0",
     "mocha": "^5.0.4",
+    "nyc": "^11.4.1",
     "pkg": "^4.3.0",
     "snazzy": "7.0.0",
     "standard": "^11.0.0"

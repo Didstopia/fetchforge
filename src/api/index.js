@@ -2,7 +2,6 @@ const constants = require('../utils/constants')
 const log = require('../utils/log')
 
 const path = require('path')
-// const os = require('os')
 
 const ApolloClient = require('apollo-client-preset').ApolloClient
 const HttpLink = require('apollo-link-http').HttpLink

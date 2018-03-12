@@ -1,4 +1,11 @@
-// TODO: Implement tests for the CLI itself
-// TODO: Implement tests for the package process? Or should that be done in Travis instead?
+/* eslint-disable no-unused-expressions */
+/* global describe, it */
 
-console.log('WARNING: Tests not implemented!')
+const chai = require('chai')
+const expect = chai.expect
+
+describe('stuff', () => {
+  it('should do stuff', () => {
+    expect(true).be.true
+  })
+})

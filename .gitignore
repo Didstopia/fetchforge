@@ -5,6 +5,7 @@ fetchforge-*
 tmp/
 .pkg/
 build/
+.nyc_output/
 
 ### dotenv ###
 .env
