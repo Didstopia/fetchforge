@@ -15,7 +15,6 @@ const mkdirp = require('mkdir-recursive').mkdirSync
 describe('App', () => {
   describe('API', () => {
     beforeEach(async () => {
-      // console.log('Test begin..')
       this.pathOverride = './tmp/fetchforge_unit_test'
       this.realPath = path.resolve(path.normalize(this.pathOverride))
       console.log('--- REMOVING TEMPORARY DATA ---')
@@ -29,9 +28,6 @@ describe('App', () => {
     it('Test with a valid username', async () => {
       let api = new API('Dids', this.pathOverride)
       let results = await api.loadVideos('', 0, 1, 2)
-      /* await api.client.resetStore()
-      await api.client.cache.reset()
-      api.client = undefined */
       expect(results).to.not.be.empty
       expect(results.videos).to.not.be.empty
       expect(results.total).to.be.greaterThan(0)
@@ -47,9 +43,6 @@ describe('App', () => {
       let api = new API('asdf', this.pathOverride)
       try {
         await api.loadVideos('', 0, 1, 1)
-        /* await api.client.resetStore()
-        await api.client.cache.reset()
-        api.client = undefined */
       } catch (err) {
         return
       }

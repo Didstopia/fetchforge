@@ -13,9 +13,6 @@ const sanitize = require('sanitize-filename')
 const mkdirp = require('mkdir-recursive').mkdirSync
 const ForgeAPI = require('../api')
 
-const clui = require('clui')
-const Spinner = clui.Spinner
-
 // Create a new CLI class
 class CLI {
   constructor () {
@@ -137,14 +134,7 @@ class CLI {
     }
 
     // Create a spinner
-    let spinner = new Spinner('Downloading clips..', ['◜', '◝', '◞', '◟'])
-    if (constants.IS_TEST) {
-      spinner = {
-        start: () => {},
-        stop: () => {},
-        message: () => {}
-      }
-    }
+    let spinner = constants.Spinner
 
     log.debug('Downloading clips from user:', username)
 
@@ -153,6 +143,9 @@ class CLI {
 
     let api = new ForgeAPI(username, pathOverride)
     let args = constants.IS_TEST ? ['', 0, 1, 2] : []
+
+    // FIXME: If we await or return this, then we'll get Apollo cache errors,
+    //        as we're removing the cache while the object still exists..
     api.loadVideos(...args)
       .then(async result => {
         log.debug(`Got a list of ${result.videos.length}/${result.total} videos!`)

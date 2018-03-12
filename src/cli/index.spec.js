@@ -110,6 +110,7 @@ describe('App', () => {
       })
       try {
         await cli.promptForUser()
+        return
       } catch (err) {
         throw err
       }

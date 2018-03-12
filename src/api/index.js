@@ -13,9 +13,6 @@ const fetch = require('node-fetch')
 
 const mkdirp = require('mkdir-recursive').mkdirSync
 
-const clui = require('clui')
-const Spinner = clui.Spinner
-
 // Create a new API class
 class API {
   constructor (username, pathOverride) {
@@ -44,14 +41,7 @@ class API {
     })
 
     // Create and start a spinner
-    this.spinner = new Spinner('Listing clips..', ['◜', '◝', '◞', '◟'])
-    if (constants.IS_TEST) {
-      this.spinner = {
-        start: () => {},
-        stop: () => {},
-        message: () => {}
-      }
-    }
+    this.spinner = constants.Spinner
     this.spinner.start()
 
     // log.debug('New API() constructed for username:', username)
