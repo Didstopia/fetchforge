@@ -7,10 +7,11 @@ const fs = require('fs')
 const path = require('path')
 const promisify = require('util').promisify
 const stat = promisify(fs.stat)
-const mkdir = promisify(fs.mkdir)
+// const mkdir = promisify(fs.mkdir)
 const writeFile = promisify(fs.writeFile)
 const utimes = promisify(fs.utimes)
 const sanitize = require('sanitize-filename')
+const mkdirp = require('mkdir-recursive').mkdirSync
 const ForgeAPI = require('../api')
 
 const clui = require('clui')
@@ -128,9 +129,9 @@ const download = async (username, pathOverride) => {
 
     // Make sure the correct folder structure exists
     let gamePath = path.join(userPath, video.game.slug)
-    try { await stat(downloadPath) } catch (e) { await mkdir(downloadPath) }
-    try { await stat(userPath) } catch (e) { await mkdir(userPath) }
-    try { await stat(gamePath) } catch (e) { await mkdir(gamePath) }
+    // mkdirp(downloadPath)
+    // mkdirp(userPath)
+    mkdirp(gamePath)
 
     // Create a Date object from the video creation date string
     let videoCreationDate = new Date(video.createdAt)
