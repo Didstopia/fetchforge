@@ -4,8 +4,8 @@
 const chai = require('chai')
 const expect = chai.expect
 
-describe('stuff', () => {
-  it('should do stuff', () => {
+describe('App', () => {
+  it('TODO: Test app stuff', () => {
     expect(true).be.true
   })
 })

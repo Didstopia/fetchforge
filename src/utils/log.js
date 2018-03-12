@@ -1,15 +1,8 @@
-// TODO: Either switch to logscribe or handle stringifying objects?
-
 const colors = require('colors')
 const constants = require('./constants')
 
 colors.setTheme({
-  // input: 'grey',
-  // verbose: 'cyan',
-  // prompt: 'grey',
-  // data: 'grey',
   help: 'cyan',
-  // silly: 'rainbow',
   debug: 'grey',
   info: 'green',
   warning: 'yellow',

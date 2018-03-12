@@ -9,6 +9,7 @@ const AsyncNodeStorage = require('redux-persist-node-storage').AsyncNodeStorage
 const InMemoryCache = require('apollo-cache-inmemory').InMemoryCache
 const persistCache = require('apollo-cache-persist').persistCache
 const gql = require('graphql-tag')
+const fetch = require('node-fetch')
 
 const mkdirp = require('mkdir-recursive').mkdirSync
 
@@ -38,7 +39,7 @@ class API {
 
     // Create a new Apollo client
     this.client = new ApolloClient({
-      link: new HttpLink({ uri: constants.FORGE_API_BASE }),
+      link: new HttpLink({ uri: constants.FORGE_API_BASE, fetch: fetch }),
       cache: cache
     })
 
@@ -49,7 +50,7 @@ class API {
     // log.debug('New API() constructed for username:', username)
   }
 
-  async loadVideos (cursor = '', index = 0, count = 24) {
+  async loadVideos (cursor = '', index = 0, count = 24, limit = -1) {
     // log.debug('Loading videos with cursor, index and count:', cursor, index, count)
 
     // this.spinner.message(`Listing clips.. ${index}/${}`)
@@ -119,16 +120,15 @@ class API {
         // Bail early if there are no videos
         if (!result.videos.length) {
           this.spinner.stop()
-          log.error(`Error: No clips were found for user "${this.username}"`)
-          process.exit(1)
+          throw new Error(`No clips were found for user "${this.username}"`)
         }
 
         // Check if we need to process more results
-        if (response.data.user._videos20YgKr.pageInfo.hasNextPage) {
+        if (response.data.user._videos20YgKr.pageInfo.hasNextPage && (limit !== -1 && index + count < limit)) {
           // log.debug(`Loading more results.. (${result.total} clips total)`)
 
           // Load more results (recursively)
-          let moreResults = await this.loadVideos(response.data.user._videos20YgKr.pageInfo.endCursor, index + count, count)
+          let moreResults = await this.loadVideos(response.data.user._videos20YgKr.pageInfo.endCursor, index + count, count, limit)
 
           // Combine and store the results
           moreResults.videos = result.videos.concat(moreResults.videos)
@@ -144,8 +144,7 @@ class API {
         // Bail out if GraphQL throws errors
         this.spinner.stop()
         log.debug('GraphQL query failed:', JSON.stringify(error))
-        log.error(`Error: An unknown error occurred (perhaps user "${this.username}" doesn't exist?)`)
-        process.exit(1)
+        throw new Error(`An unknown error occurred (perhaps user "${this.username}" doesn't exist?)`)
       })
   }
 }

@@ -9,8 +9,8 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "codecov": "codecov",
-    "test": "standard | snazzy && nyc mocha --timeout=5000",
+    "coverage": "codecov",
+    "test": "standard | snazzy && nyc mocha --timeout=5000 src/**/*.spec.js",
     "package": "mkdir -p build && cd build && rm -f fetchforge-* && pkg ../package.json && ls fetchforge-*"
   },
   "pkg": {
@@ -24,11 +24,11 @@
     ]
   },
   "nyc": {
-    "check-coverage": false,
-    "per-file": false,
-    "all": false,
+    "check-coverage": true,
+    "per-file": true,
     "lines": 75,
     "cache": true,
+    "all": true,
     "reporter": [
       "lcov",
       "text"
@@ -40,7 +40,9 @@
       "test{,-*}.js",
       "**/*.test.js",
       "**/__tests__/**",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "src/utils/constants.js",
+      "pkg.js"
     ]
   },
   "repository": {
@@ -74,6 +76,7 @@
     "mocha": "^5.0.4",
     "nyc": "^11.4.1",
     "pkg": "^4.3.0",
+    "sinon": "^4.4.3",
     "snazzy": "7.0.0",
     "standard": "^11.0.0"
   },
