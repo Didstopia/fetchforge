@@ -45,6 +45,13 @@ class API {
 
     // Create and start a spinner
     this.spinner = new Spinner('Listing clips..', ['◜', '◝', '◞', '◟'])
+    if (constants.IS_TEST) {
+      this.spinner = {
+        start: () => {},
+        stop: () => {},
+        message: () => {}
+      }
+    }
     this.spinner.start()
 
     // log.debug('New API() constructed for username:', username)

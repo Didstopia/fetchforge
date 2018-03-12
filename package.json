@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node src/index.js",
     "coverage": "codecov",
-    "test": "standard | snazzy && rm -fr tmp && nyc mocha --timeout=60000 src/**/*.spec.js",
+    "test": "standard | snazzy && rm -fr tmp && NODE_ENV=test nyc mocha --timeout=60000 src/**/*.spec.js",
     "package": "mkdir -p build && cd build && rm -f fetchforge-* && pkg ../package.json && ls fetchforge-*"
   },
   "pkg": {

@@ -19,7 +19,6 @@ const Spinner = clui.Spinner
 // Create a new CLI class
 class CLI {
   constructor () {
-    this.isUnitTest = false
     this.pathOverride = undefined
   }
 
@@ -73,7 +72,7 @@ class CLI {
         }
       }
 
-      this.pathOverride = this.isUnitTest ? path.resolve(path.normalize('./tmp/fetchforge_unit_test')) : undefined
+      this.pathOverride = constants.IS_TEST ? path.resolve(path.normalize('./tmp/fetchforge_unit_test')) : undefined
       if (args.includes('-p') || args.includes('--path')) {
         this.pathOverride = args[args.indexOf('-p') !== -1 ? args.indexOf('-p') + 1 : args.indexOf('--path') + 1]
 
@@ -133,12 +132,19 @@ class CLI {
     }
 
     if (!pathOverride) {
-      pathOverride = this.isUnitTest ? path.resolve(path.normalize('./tmp/fetchforge_unit_test')) : undefined
+      pathOverride = constants.IS_TEST ? path.resolve(path.normalize('./tmp/fetchforge_unit_test')) : undefined
       console.log('pathOverride2:', pathOverride)
     }
 
     // Create a spinner
     let spinner = new Spinner('Downloading clips..', ['◜', '◝', '◞', '◟'])
+    if (constants.IS_TEST) {
+      spinner = {
+        start: () => {},
+        stop: () => {},
+        message: () => {}
+      }
+    }
 
     log.debug('Downloading clips from user:', username)
 
@@ -146,7 +152,7 @@ class CLI {
     let startTime = process.hrtime()
 
     let api = new ForgeAPI(username, pathOverride)
-    let args = this.isUnitTest ? ['', 0, 1, 2] : []
+    let args = constants.IS_TEST ? ['', 0, 1, 2] : []
     api.loadVideos(...args)
       .then(async result => {
         log.debug(`Got a list of ${result.videos.length}/${result.total} videos!`)

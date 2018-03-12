@@ -26,19 +26,16 @@ describe('App', () => {
     describe('Test arguments', () => {
       it('-v', () => {
         let cli = new CLI()
-        cli.isUnitTest = true
         cli.handleArgs(['-v'])
         expect(process.env.NODE_ENV).equal('verbose')
       })
       it('-verbose', () => {
         let cli = new CLI()
-        cli.isUnitTest = true
         cli.handleArgs(['--verbose'])
         expect(process.env.NODE_ENV).equal('verbose')
       })
       it('-p (without path)', async () => {
         let cli = new CLI()
-        cli.isUnitTest = true
         await cli.handleArgs(['-p'])
           .then(() => {
             throw new Error('Missing path argument should throw an error')
@@ -56,13 +53,11 @@ describe('App', () => {
       })
       it('-p (with path)', async () => {
         let cli = new CLI()
-        cli.isUnitTest = true
         await cli.handleArgs(['-p', this.realPath, 'Dids'])
         expect(cli.pathOverride).to.be.equals(this.realPath)
       })
       it('--path (without path)', async () => {
         let cli = new CLI()
-        cli.isUnitTest = true
         await cli.handleArgs(['--path'])
           .then(() => {
             throw new Error('Missing path argument should throw an error')
@@ -80,14 +75,12 @@ describe('App', () => {
       })
       it('--path (with path)', async () => {
         let cli = new CLI()
-        cli.isUnitTest = true
         await cli.handleArgs(['--path', this.realPath, 'Dids'])
         expect(cli.pathOverride).to.be.equals(this.realPath)
       })
     })
     it('Test parseHrtimeToSeconds()', () => {
       let cli = new CLI()
-      cli.isUnitTest = true
       let startTime = process.hrtime()
       setTimeout(() => {
         let endTime = cli.parseHrtimeToSeconds(process.hrtime(startTime))
@@ -96,7 +89,6 @@ describe('App', () => {
     })
     it('Test promptForUser() with an empty username', async () => {
       let cli = new CLI()
-      cli.isUnitTest = true
       let stdin = require('mock-stdin').stdin()
       process.nextTick(() => {
         stdin.send(' ')
@@ -111,7 +103,6 @@ describe('App', () => {
     })
     it('Test promptForUser() with a valid username', async () => {
       let cli = new CLI()
-      cli.isUnitTest = true
       let stdin = require('mock-stdin').stdin()
       process.nextTick(() => {
         stdin.send('Dids')
@@ -125,7 +116,6 @@ describe('App', () => {
     })
     it('Test download() twice', async () => {
       let cli = new CLI()
-      cli.isUnitTest = true
       try {
         await cli.download('Dids')
         await cli.download('Dids')
