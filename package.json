@@ -45,7 +45,7 @@
   },
   "homepage": "https://github.com/Didstopia/fetchforge#readme",
   "devDependencies": {
-    "mocha": "^5.0.3",
+    "mocha": "^5.0.4",
     "pkg": "^4.3.0",
     "snazzy": "7.0.0",
     "standard": "^11.0.0"
@@ -55,7 +55,7 @@
     "apollo-cache-persist": "^0.1.1",
     "apollo-client-preset": "^1.0.8",
     "clui": "^0.3.6",
-    "colors": "^1.1.2",
+    "colors": "^1.2.0",
     "figlet": "^1.2.0",
     "graphql": "^0.12.3",
     "graphql-tag": "^2.8.0",
