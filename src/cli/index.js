@@ -12,6 +12,7 @@ const utimes = promisify(fs.utimes)
 const sanitize = require('sanitize-filename')
 const mkdirp = require('mkdir-recursive').mkdirSync
 const ForgeAPI = require('../api')
+const moment = require('moment')
 
 // Create a new CLI class
 class CLI {
@@ -162,14 +163,44 @@ class CLI {
 
         log.debug('Base download path:', downloadPath)
 
+        // Store the download start time in milliseconds, used to calculate the ETA
+        let downloadStartTime = new Date().getTime()
+
         // Start downloading each video file to the local filesystem
         let index = 1 // This is technically not accurate but it does give the user some "inspiration"
+        let skipIndex = 0 // This keeps track of skipped clips
+
+        // Create a function for updating the spinner
+        let spinnerText = ''
+        let updateFunc = (time, count, total, skip) => {
+          // Calculate the ETA and update the spinner
+          let elapsedTime = (new Date().getTime()) - time
+          let chunksPerTime = (count - skip) / elapsedTime
+          let estimatedTotalTime = (total - skip) / chunksPerTime
+          let timeLeftInSeconds = (estimatedTotalTime - elapsedTime) / 1000
+          let withOneDecimalPlace = Math.round(timeLeftInSeconds * 10) / 10
+          if (isNaN(withOneDecimalPlace)) {
+            withOneDecimalPlace = 0
+          }
+          let newSpinnerText = `Downloading clip ${count} out of ${total} (${parseInt(count / total * 100)}%) - ${moment.duration(withOneDecimalPlace, 'seconds').humanize()} left`
+          let needsClearing = newSpinnerText.length < spinnerText.length
+          spinnerText = newSpinnerText
+          if (needsClearing) spinner.stop()
+          spinner.message(spinnerText)
+          if (needsClearing) spinner.start()
+        }
+
+        // Create a new timer for updating the spinner and ETA
+        let updateTimer = setInterval(() => {
+          updateFunc(downloadStartTime, index, result.videos.length, skipIndex)
+        }, 5000)
+
         for (let i in result.videos) {
           // Get a reference to the video details
           let video = result.videos[i]
 
           // Update the spinner
-          spinner.message(`Downloading clip ${index} out of ${result.videos.length} (total progress: ${parseInt(index / result.videos.length * 100)}%)`)
+          updateFunc(downloadStartTime, index, result.videos.length, skipIndex)
 
           // Make sure the correct folder structure exists
           let gamePath = path.join(userPath, video.game.slug)
@@ -209,6 +240,12 @@ class CLI {
           try {
             if (await stat(videoPath)) {
               log.debug('Video already exists (skipping):', videoName)
+
+              // Increment the skip index, so our ETA calculation knows about it
+              skipIndex++
+
+              // Reset the download start time
+              downloadStartTime = new Date().getTime()
             }
           } catch (e) {
             // Process the video
@@ -235,6 +272,9 @@ class CLI {
           // Increment the index
           index++
         }
+
+        // Stop the timer
+        clearInterval(updateTimer)
 
         // Stop the spinner
         spinner.stop()

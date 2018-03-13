@@ -26,12 +26,14 @@ class API {
 
     // Setup caching
     let cachePath = path.join(pathOverride || constants.DOWNLOAD_PATH, 'fetchforge', '.cache')
+    log.verbose('Cache path:', cachePath)
     mkdirp(cachePath)
     let cache = new InMemoryCache()
     persistCache({
       cache: cache,
-      storage: new AsyncNodeStorage(path.join(pathOverride || cachePath)),
-      maxSize: false
+      storage: new AsyncNodeStorage(cachePath),
+      maxSize: false,
+      debug: constants.IS_DEBUG
     })
 
     // Create a new Apollo client
@@ -48,7 +50,7 @@ class API {
   }
 
   async loadVideos (cursor = '', index = 0, count = 24, limit = -1) {
-    log.debug('Loading videos with cursor, index, count and limit:', cursor, index, count, limit)
+    // log.debug('Loading videos with cursor, index, count and limit:', cursor, index, count, limit)
 
     // this.spinner.message(`Listing clips.. ${index}/${}`)
 
@@ -123,7 +125,7 @@ class API {
         // Check if we need to process more results
         let resultsLimited = limit !== -1 && index + count >= limit
         if (response.data.user._videos20YgKr.pageInfo.hasNextPage && !resultsLimited) {
-          log.debug(`Loading more results.. (${result.total} clips total)`)
+          // log.debug(`Loading more results.. (${result.total} clips total)`)
 
           // Load more results (recursively)
           let moreResults = await this.loadVideos(response.data.user._videos20YgKr.pageInfo.endCursor, index + count, count, limit)
