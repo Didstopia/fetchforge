@@ -1,7 +1,7 @@
 const constants = require('../utils/constants')
 const log = require('../utils/log')
 
-const os = require('os')
+const path = require('path')
 
 const ApolloClient = require('apollo-client-preset').ApolloClient
 const HttpLink = require('apollo-link-http').HttpLink
@@ -9,13 +9,17 @@ const AsyncNodeStorage = require('redux-persist-node-storage').AsyncNodeStorage
 const InMemoryCache = require('apollo-cache-inmemory').InMemoryCache
 const persistCache = require('apollo-cache-persist').persistCache
 const gql = require('graphql-tag')
+const fetch = require('node-fetch')
 
-const clui = require('clui')
-const Spinner = clui.Spinner
+const mkdirp = require('mkdir-recursive').mkdirSync
+
+const promisify = require('util').promisify
+const fs = require('fs')
+const writeFile = promisify(fs.writeFile)
 
 // Create a new API class
 class API {
-  constructor (username) {
+  constructor (username, pathOverride) {
     // Validate the username
     if (!username) {
       throw new Error('No username specified')
@@ -24,31 +28,58 @@ class API {
     // Store the username
     this.username = username
 
-    // Setup caching
-    let cache = new InMemoryCache()
-    persistCache({
-      cache: cache,
-      storage: new AsyncNodeStorage(constants.IS_DEBUG ? './tmp' : os.tmpdir()),
-      maxSize: false
-    })
-
-    // Create a new Apollo client
-    this.client = new ApolloClient({
-      link: new HttpLink({ uri: constants.FORGE_API_BASE }),
-      cache: cache
-    })
-
-    // Create and start a spinner
-    this.spinner = new Spinner('Listing clips..', ['◜', '◝', '◞', '◟'])
-    this.spinner.start()
-
-    // log.debug('New API() constructed for username:', username)
+    // Store the path override
+    this.pathOverride = pathOverride
   }
 
-  async loadVideos (cursor = '', index = 0, count = 24) {
-    // log.debug('Loading videos with cursor, index and count:', cursor, index, count)
+  async configure () {
+    return new Promise(async (resolve, reject) => {
+      log.verbose('Configuring API client..')
+
+      // Setup caching
+      let cachePath = path.join(this.pathOverride || constants.DOWNLOAD_PATH, 'fetchforge', '.cache')
+      log.verbose('Cache path:', cachePath)
+      await mkdirp(cachePath)
+      await writeFile(path.join(cachePath, 'apollo-cache-persist'), JSON.stringify({}), 'utf8')
+      let cache = new InMemoryCache()
+      await persistCache({
+        cache: cache,
+        storage: new AsyncNodeStorage(cachePath),
+        maxSize: false,
+        debug: constants.IS_DEBUG
+      })
+        .catch(err => {
+          return reject(err)
+        })
+
+      // Create a new Apollo client
+      this.client = new ApolloClient({
+        link: new HttpLink({ uri: constants.FORGE_API_BASE, fetch: fetch }),
+        cache: cache
+      })
+
+      // Create and start a spinner
+      this.spinner = constants.Spinner
+      // this.spinner.start()
+
+      log.verbose('API client ready!')
+
+      return resolve()
+    })
+  }
+
+  async loadVideos (cursor = '', index = 0, count = 24, limit = -1) {
+    // log.debug('Loading videos with cursor, index, count and limit:', cursor, index, count, limit)
 
     // this.spinner.message(`Listing clips.. ${index}/${}`)
+
+    if (!this['client']) {
+      await this.configure()
+    }
+
+    if (!this.spinner.timer) {
+      this.spinner.start()
+    }
 
     return this.client.query({
       query: gql`
@@ -115,16 +146,16 @@ class API {
         // Bail early if there are no videos
         if (!result.videos.length) {
           this.spinner.stop()
-          log.error(`Error: No clips were found for user "${this.username}"`)
-          process.exit(1)
+          throw new Error(`No clips were found for user "${this.username}"`)
         }
 
         // Check if we need to process more results
-        if (response.data.user._videos20YgKr.pageInfo.hasNextPage) {
+        let resultsLimited = limit !== -1 && index + count >= limit
+        if (response.data.user._videos20YgKr.pageInfo.hasNextPage && !resultsLimited) {
           // log.debug(`Loading more results.. (${result.total} clips total)`)
 
           // Load more results (recursively)
-          let moreResults = await this.loadVideos(response.data.user._videos20YgKr.pageInfo.endCursor, index + count, count)
+          let moreResults = await this.loadVideos(response.data.user._videos20YgKr.pageInfo.endCursor, index + count, count, limit)
 
           // Combine and store the results
           moreResults.videos = result.videos.concat(moreResults.videos)
@@ -140,8 +171,7 @@ class API {
         // Bail out if GraphQL throws errors
         this.spinner.stop()
         log.debug('GraphQL query failed:', JSON.stringify(error))
-        log.error(`Error: An unknown error occurred (perhaps user "${this.username}" doesn't exist?)`)
-        process.exit(1)
+        throw new Error(`An unknown error occurred (perhaps user "${this.username}" doesn't exist?)`)
       })
   }
 }

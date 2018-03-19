@@ -1,0 +1,8 @@
+.vscode/
+.env
+codecov.yml
+fetchforge-*
+build/
+.nyc_output/
+coverage/
+tmp/
