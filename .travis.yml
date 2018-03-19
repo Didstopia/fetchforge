@@ -24,7 +24,9 @@ deploy:
     acl: public_read
     local_dir: build
     skip_cleanup: true
-    all_branches: true
+    on:
+      tags: false
+      all_branches: true
   - provider: releases
     api_key: $GITHUB_OAUTH_TOKEN
     file_glob: true
