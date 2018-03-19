@@ -15,7 +15,7 @@ before_deploy:
   - mkdir -p ${BUILD_PATH}
   - npm run package
   - find ${TRAVIS_BUILD_DIR}/build -name 'fetchforge-*' -print -exec zip -j '{}.zip' '{}' \; -exec rm -f '{}' \;
-  - set -x;find ${TRAVIS_BUILD_DIR}/build -name 'fetchforge-*.exe.zip' -print -exec mv '{}' $(echo '{}' | cut -f 1 -d '.').zip \;set +x;
+  - find ${TRAVIS_BUILD_DIR}/build -name 'fetchforge-*.exe.zip' -print -exec sh -c 'mv {} $(echo {} | cut -f 1 -d .).zip' \;
   - mv ${TRAVIS_BUILD_DIR}/build/fetchforge-*.zip ${BUILD_PATH}/
 deploy:
   - provider: s3
