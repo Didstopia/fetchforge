@@ -25,11 +25,12 @@ deploy:
     local_dir: build
     skip_cleanup: true
     on:
-      branch: development
+      tags: false
   - provider: releases
     api_key: $GITHUB_OAUTH_TOKEN
     file_glob: true
-    file: fetchforge-*
+    file: ${BUILD_PATH}/fetchforge-*
     skip_cleanup: true
     on:
+      branch: master
       tags: true
