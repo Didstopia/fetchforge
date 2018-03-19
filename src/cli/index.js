@@ -125,166 +125,166 @@ class CLI {
   }
 
   async download (username, pathOverride) {
-    if (!validator.isAlphanumeric(username)) {
-      return new Error('Username is invalid or missing')
-    }
+    return new Promise(async (resolve, reject) => {
+      if (!validator.isAlphanumeric(username)) {
+        return reject(new Error('Username is invalid or missing'))
+      }
 
-    if (!pathOverride) {
-      pathOverride = constants.IS_TEST ? path.resolve(path.normalize('./tmp/fetchforge_unit_test')) : undefined
-      console.log('pathOverride2:', pathOverride)
-    }
+      if (!pathOverride) {
+        pathOverride = constants.IS_TEST ? path.resolve(path.normalize('./tmp/fetchforge_unit_test')) : undefined
+      }
 
-    // Create a spinner
-    let spinner = constants.Spinner
+      // Create a spinner
+      let spinner = constants.Spinner
 
-    log.debug('Downloading clips from user:', username)
+      log.debug('Downloading clips from user:', username)
 
-    // Keep track of the start time
-    let startTime = process.hrtime()
+      // Keep track of the start time
+      let startTime = process.hrtime()
 
-    let api = new ForgeAPI(username, pathOverride)
-    let args = constants.IS_TEST ? ['', 0, 1, 2] : []
+      let api = new ForgeAPI(username, pathOverride)
+      let args = constants.IS_TEST ? ['', 0, 1, 2] : []
 
-    // FIXME: If we await or return this, then we'll get Apollo cache errors,
-    //        as we're removing the cache while the object still exists..
-    api.loadVideos(...args)
-      .then(async result => {
-        log.debug(`Got a list of ${result.videos.length}/${result.total} videos!`)
+      await api.loadVideos(...args)
+        .then(async result => {
+          log.debug(`Got a list of ${result.videos.length}/${result.total} videos!`)
 
-        let apiListExecTime = this.parseHrtimeToSeconds(process.hrtime(startTime))
-        log.debug(`Listing videos took ${apiListExecTime} seconds!`)
+          let apiListExecTime = this.parseHrtimeToSeconds(process.hrtime(startTime))
+          log.debug(`Listing videos took ${apiListExecTime} seconds!`)
 
-        // Start the spinner
-        spinner.start()
+          // Start the spinner
+          spinner.start()
 
-        // Prepare global paths
-        let downloadPath = path.join(pathOverride || constants.DOWNLOAD_PATH, 'fetchforge')
-        let userPath = path.join(downloadPath, username)
+          // Prepare global paths
+          let downloadPath = path.join(pathOverride || constants.DOWNLOAD_PATH, 'fetchforge')
+          let userPath = path.join(downloadPath, username)
 
-        log.debug('Base download path:', downloadPath)
+          log.debug('Base download path:', downloadPath)
 
-        // Store the download start time in milliseconds, used to calculate the ETA
-        let downloadStartTime = new Date().getTime()
+          // Store the download start time in milliseconds, used to calculate the ETA
+          let downloadStartTime = new Date().getTime()
 
-        // Start downloading each video file to the local filesystem
-        let index = 1 // This is technically not accurate but it does give the user some "inspiration"
-        let skipIndex = 0 // This keeps track of skipped clips
+          // Start downloading each video file to the local filesystem
+          let index = 1 // This is technically not accurate but it does give the user some "inspiration"
+          let skipIndex = 0 // This keeps track of skipped clips
 
-        // Create a function for updating the spinner
-        let spinnerText = ''
-        let updateFunc = (time, count, total, skip) => {
+          // Create a function for updating the spinner
+          let spinnerText = ''
+          let updateFunc = (time, count, total, skip) => {
           // Calculate the ETA and update the spinner
-          let elapsedTime = (new Date().getTime()) - time
-          let chunksPerTime = (count - skip) / elapsedTime
-          let estimatedTotalTime = (total - skip) / chunksPerTime
-          let timeLeftInSeconds = (estimatedTotalTime - elapsedTime) / 1000
-          let withOneDecimalPlace = Math.round(timeLeftInSeconds * 10) / 10
-          if (isNaN(withOneDecimalPlace)) {
-            withOneDecimalPlace = 0
+            let elapsedTime = (new Date().getTime()) - time
+            let chunksPerTime = (count - skip) / elapsedTime
+            let estimatedTotalTime = (total - skip) / chunksPerTime
+            let timeLeftInSeconds = (estimatedTotalTime - elapsedTime) / 1000
+            let withOneDecimalPlace = Math.round(timeLeftInSeconds * 10) / 10
+            if (isNaN(withOneDecimalPlace)) {
+              withOneDecimalPlace = 0
+            }
+            let newSpinnerText = `Downloading clip ${count} out of ${total} (${parseInt(count / total * 100)}%) - ${moment.duration(withOneDecimalPlace, 'seconds').humanize()} left`
+            let needsClearing = newSpinnerText.length < spinnerText.length
+            spinnerText = newSpinnerText
+            if (needsClearing) spinner.stop()
+            spinner.message(spinnerText)
+            if (needsClearing) spinner.start()
           }
-          let newSpinnerText = `Downloading clip ${count} out of ${total} (${parseInt(count / total * 100)}%) - ${moment.duration(withOneDecimalPlace, 'seconds').humanize()} left`
-          let needsClearing = newSpinnerText.length < spinnerText.length
-          spinnerText = newSpinnerText
-          if (needsClearing) spinner.stop()
-          spinner.message(spinnerText)
-          if (needsClearing) spinner.start()
-        }
 
-        // Create a new timer for updating the spinner and ETA
-        let updateTimer = setInterval(() => {
-          updateFunc(downloadStartTime, index, result.videos.length, skipIndex)
-        }, 5000)
+          // Create a new timer for updating the spinner and ETA
+          let updateTimer = setInterval(() => {
+            updateFunc(downloadStartTime, index, result.videos.length, skipIndex)
+          }, 5000)
 
-        for (let i in result.videos) {
+          for (let i in result.videos) {
           // Get a reference to the video details
-          let video = result.videos[i]
+            let video = result.videos[i]
 
-          // Update the spinner
-          updateFunc(downloadStartTime, index, result.videos.length, skipIndex)
+            // Update the spinner
+            updateFunc(downloadStartTime, index, result.videos.length, skipIndex)
 
-          // Make sure the correct folder structure exists
-          let gamePath = path.join(userPath, video.game.slug)
-          // mkdirp(downloadPath)
-          // mkdirp(userPath)
-          mkdirp(gamePath)
+            // Make sure the correct folder structure exists
+            let gamePath = path.join(userPath, video.game.slug)
+            // mkdirp(downloadPath)
+            // mkdirp(userPath)
+            mkdirp(gamePath)
 
-          // Create a Date object from the video creation date string
-          let videoCreationDate = new Date(video.createdAt)
+            // Create a Date object from the video creation date string
+            let videoCreationDate = new Date(video.createdAt)
 
-          // Create unique and sanitized filenames for all of the data
-          let baseName = sanitize(video.title ? `${video.title}_${video.id}` : `Untitled_${video.id}`)
-            .replace(/\s/g, '_') // Replace spaces with underscors
-            .replace(/[^a-z0-9_]/gi, '') // Remove disallowed characters
-          let thumbnailName = baseName + '.jpg'
-          let videoName = baseName + '.mp4'
-          let jsonName = baseName + '.json'
+            // Create unique and sanitized filenames for all of the data
+            let baseName = sanitize(video.title ? `${video.title}_${video.id}` : `Untitled_${video.id}`)
+              .replace(/\s/g, '_') // Replace spaces with underscors
+              .replace(/[^a-z0-9_]/gi, '') // Remove disallowed characters
+            let thumbnailName = baseName + '.jpg'
+            let videoName = baseName + '.mp4'
+            let jsonName = baseName + '.json'
 
-          let thumbnailPath = path.join(gamePath, thumbnailName)
-          let videoPath = path.join(gamePath, videoName)
-          let jsonPath = path.join(gamePath, jsonName)
-          try {
-            if (await stat(thumbnailPath)) {
-              log.debug('Thumbnail already exists (skipping):', thumbnailName)
-            }
-          } catch (e) {
+            let thumbnailPath = path.join(gamePath, thumbnailName)
+            let videoPath = path.join(gamePath, videoName)
+            let jsonPath = path.join(gamePath, jsonName)
+            try {
+              if (await stat(thumbnailPath)) {
+                log.debug('Thumbnail already exists (skipping):', thumbnailName)
+              }
+            } catch (e) {
             // Process the thumbnail
-            log.debug(`Downloading thumbnail from ${video.thumbnail} to ${thumbnailPath}`)
-            await r2.get(video.thumbnail).response
-              .then(response => response.buffer())
-              .then(async buffer => {
-                await writeFile(thumbnailPath, buffer)
-                await utimes(thumbnailPath, videoCreationDate, videoCreationDate)
-                log.debug('Wrote thumbnail to disk:', thumbnailName)
-              })
-          }
-          try {
-            if (await stat(videoPath)) {
-              log.debug('Video already exists (skipping):', videoName)
-
-              // Increment the skip index, so our ETA calculation knows about it
-              skipIndex++
-
-              // Reset the download start time
-              downloadStartTime = new Date().getTime()
+              log.debug(`Downloading thumbnail from ${video.thumbnail} to ${thumbnailPath}`)
+              await r2.get(video.thumbnail).response
+                .then(response => response.buffer())
+                .then(async buffer => {
+                  await writeFile(thumbnailPath, buffer)
+                  await utimes(thumbnailPath, videoCreationDate, videoCreationDate)
+                  log.debug('Wrote thumbnail to disk:', thumbnailName)
+                })
             }
-          } catch (e) {
+            try {
+              if (await stat(videoPath)) {
+                log.debug('Video already exists (skipping):', videoName)
+
+                // Increment the skip index, so our ETA calculation knows about it
+                skipIndex++
+
+                // Reset the download start time
+                downloadStartTime = new Date().getTime()
+              }
+            } catch (e) {
             // Process the video
-            log.debug(`Downloading video from ${video.url} to ${videoPath}`)
-            await r2.get(video.url).response
-              .then(response => response.buffer())
-              .then(async buffer => {
-                await writeFile(videoPath, buffer)
-                await utimes(videoPath, videoCreationDate, videoCreationDate)
-                log.debug('Wrote video to disk:', videoName)
-              })
-          }
-          try {
-            if (await stat(jsonPath)) {
-              log.debug('JSON already exists (skipping):', jsonPath)
+              log.debug(`Downloading video from ${video.url} to ${videoPath}`)
+              await r2.get(video.url).response
+                .then(response => response.buffer())
+                .then(async buffer => {
+                  await writeFile(videoPath, buffer)
+                  await utimes(videoPath, videoCreationDate, videoCreationDate)
+                  log.debug('Wrote video to disk:', videoName)
+                })
             }
-          } catch (e) {
+            try {
+              if (await stat(jsonPath)) {
+                log.debug('JSON already exists (skipping):', jsonPath)
+              }
+            } catch (e) {
             // Process the JSON
-            await writeFile(jsonPath, JSON.stringify(video, null, 2))
-            await utimes(jsonPath, videoCreationDate, videoCreationDate)
-            log.debug('Wrote JSON to disk:', jsonName)
+              await writeFile(jsonPath, JSON.stringify(video, null, 2))
+              await utimes(jsonPath, videoCreationDate, videoCreationDate)
+              log.debug('Wrote JSON to disk:', jsonName)
+            }
+
+            // Increment the index
+            index++
           }
 
-          // Increment the index
-          index++
-        }
+          // Stop the timer
+          clearInterval(updateTimer)
 
-        // Stop the timer
-        clearInterval(updateTimer)
+          // Stop the spinner
+          spinner.stop()
 
-        // Stop the spinner
-        spinner.stop()
-
-        log.debug('All done!')
-        // process.exit(0)
-      })
-      .catch(err => {
-        return err
-      })
+          log.debug('All done!')
+          return resolve()
+          // process.exit(0)
+        })
+        .catch(err => {
+          return reject(err)
+        })
+    })
   }
 
   promptForUser () {

@@ -13,6 +13,10 @@ const fetch = require('node-fetch')
 
 const mkdirp = require('mkdir-recursive').mkdirSync
 
+const promisify = require('util').promisify
+const fs = require('fs')
+const writeFile = promisify(fs.writeFile)
+
 // Create a new API class
 class API {
   constructor (username, pathOverride) {
@@ -24,35 +28,58 @@ class API {
     // Store the username
     this.username = username
 
-    // Setup caching
-    let cachePath = path.join(pathOverride || constants.DOWNLOAD_PATH, 'fetchforge', '.cache')
-    log.verbose('Cache path:', cachePath)
-    mkdirp(cachePath)
-    let cache = new InMemoryCache()
-    persistCache({
-      cache: cache,
-      storage: new AsyncNodeStorage(cachePath),
-      maxSize: false,
-      debug: constants.IS_DEBUG
+    // Store the path override
+    this.pathOverride = pathOverride
+  }
+
+  async configure () {
+    return new Promise(async (resolve, reject) => {
+      log.verbose('Configuring API client..')
+
+      // Setup caching
+      let cachePath = path.join(this.pathOverride || constants.DOWNLOAD_PATH, 'fetchforge', '.cache')
+      log.verbose('Cache path:', cachePath)
+      await mkdirp(cachePath)
+      await writeFile(path.join(cachePath, 'apollo-cache-persist'), JSON.stringify({}), 'utf8')
+      let cache = new InMemoryCache()
+      await persistCache({
+        cache: cache,
+        storage: new AsyncNodeStorage(cachePath),
+        maxSize: false,
+        debug: constants.IS_DEBUG
+      })
+        .catch(err => {
+          return reject(err)
+        })
+
+      // Create a new Apollo client
+      this.client = new ApolloClient({
+        link: new HttpLink({ uri: constants.FORGE_API_BASE, fetch: fetch }),
+        cache: cache
+      })
+
+      // Create and start a spinner
+      this.spinner = constants.Spinner
+      // this.spinner.start()
+
+      log.verbose('API client ready!')
+
+      return resolve()
     })
-
-    // Create a new Apollo client
-    this.client = new ApolloClient({
-      link: new HttpLink({ uri: constants.FORGE_API_BASE, fetch: fetch }),
-      cache: cache
-    })
-
-    // Create and start a spinner
-    this.spinner = constants.Spinner
-    this.spinner.start()
-
-    // log.debug('New API() constructed for username:', username)
   }
 
   async loadVideos (cursor = '', index = 0, count = 24, limit = -1) {
     // log.debug('Loading videos with cursor, index, count and limit:', cursor, index, count, limit)
 
     // this.spinner.message(`Listing clips.. ${index}/${}`)
+
+    if (!this['client']) {
+      await this.configure()
+    }
+
+    if (!this.spinner.timer) {
+      this.spinner.start()
+    }
 
     return this.client.query({
       query: gql`

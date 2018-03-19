@@ -1,8 +1,6 @@
 const pkg = require('../../package.json')
 const path = require('path')
-
-const clui = require('clui')
-const Spinner = clui.Spinner
+const Spinner = require('clui').Spinner
 
 module.exports = Object.freeze({
   // Environment constants

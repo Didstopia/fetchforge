@@ -18,20 +18,20 @@ describe('App', () => {
       // console.log('Test begin..')
       this.pathOverride = './tmp/fetchforge_unit_test'
       this.realPath = path.resolve(path.normalize(this.pathOverride))
-      console.log('--- REMOVING TEMPORARY DATA ---')
+      // console.log('--- REMOVING TEMPORARY DATA ---')
       await rimraf(this.realPath)
       mkdirp(this.realPath)
-      console.log('--- DONE REMOVING TEMPORARY DATA ---')
+      // console.log('--- DONE REMOVING TEMPORARY DATA ---')
     })
-    describe('Test arguments', () => {
-      it('-v', () => {
+    describe('Parameters', () => {
+      it('-v', async () => {
         let cli = new CLI()
-        cli.handleArgs(['-v'])
+        await cli.handleArgs(['-v', 'Dids'])
         expect(process.env.NODE_ENV).equal('verbose')
       })
-      it('-verbose', () => {
+      it('--verbose', async () => {
         let cli = new CLI()
-        cli.handleArgs(['--verbose'])
+        await cli.handleArgs(['--verbose', 'Dids'])
         expect(process.env.NODE_ENV).equal('verbose')
       })
       it('-p (without path)', async () => {
@@ -79,53 +79,57 @@ describe('App', () => {
         expect(cli.pathOverride).to.be.equals(this.realPath)
       })
     })
-    it('Test parseHrtimeToSeconds()', () => {
-      let cli = new CLI()
-      let startTime = process.hrtime()
-      setTimeout(() => {
-        let endTime = cli.parseHrtimeToSeconds(process.hrtime(startTime))
-        expect(parseFloat(endTime)).to.be.greaterThan(0, `${endTime} is not greater than 0`)
-      }, 100)
-    })
-    it('Test promptForUser() with an empty username', async () => {
-      let cli = new CLI()
-      let stdin = require('mock-stdin').stdin()
-      process.nextTick(() => {
-        stdin.send(' ')
-        stdin.end()
+    describe('Functionality', () => {
+      it('Test parseHrtimeToSeconds()', () => {
+        let cli = new CLI()
+        let startTime = process.hrtime()
+        setTimeout(() => {
+          let endTime = cli.parseHrtimeToSeconds(process.hrtime(startTime))
+          expect(parseFloat(endTime)).to.be.greaterThan(0, `${endTime} is not greater than 0`)
+        }, 100)
       })
-      try {
-        await cli.promptForUser()
-      } catch (err) {
-        return
-      }
-      throw new Error('Entering an empty username should have thrown an error')
-    })
-    it('Test promptForUser() with a valid username', async () => {
-      let cli = new CLI()
-      let stdin = require('mock-stdin').stdin()
-      process.nextTick(() => {
-        stdin.send('Dids')
-        stdin.end()
+      it('Test download() twice', async () => {
+        let cli = new CLI()
+        try {
+          await cli.download('Dids')
+          await cli.download('Dids')
+          if (await stat(this.realPath)) {
+            return
+          }
+        } catch (e) {
+          throw e
+        }
       })
-      try {
-        await cli.promptForUser()
-        return
-      } catch (err) {
-        throw err
-      }
     })
-    it('Test download() twice', async () => {
-      let cli = new CLI()
-      try {
-        await cli.download('Dids')
-        await cli.download('Dids')
-        if (await stat(this.realPath)) {
+    describe('Input', () => {
+      it('Test promptForUser() with an empty username', async () => {
+        let cli = new CLI()
+        let stdin = require('mock-stdin').stdin()
+        process.nextTick(() => {
+          stdin.send(' ')
+          stdin.end()
+        })
+        try {
+          await cli.promptForUser()
+        } catch (err) {
           return
         }
-      } catch (e) {
-        throw e
-      }
+        throw new Error('Entering an empty username should have thrown an error')
+      })
+      it('Test promptForUser() with a valid username', async () => {
+        let cli = new CLI()
+        let stdin = require('mock-stdin').stdin()
+        process.nextTick(() => {
+          stdin.send('Dids')
+          stdin.end()
+        })
+        try {
+          await cli.promptForUser()
+          return
+        } catch (err) {
+          throw err
+        }
+      })
     })
   })
 })

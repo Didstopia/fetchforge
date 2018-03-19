@@ -12,30 +12,41 @@ colors.setTheme({
 
 module.exports = {
   help (...args) {
-    console.log(colors.help(...args))
+    validateSpinner(() => console.log(colors.help(...args)))
   },
 
   debug (...args) {
     if (constants.IS_DEBUG) {
-      console.log(colors.debug(...args))
+      validateSpinner(() => console.log(colors.debug(...args)))
     }
   },
 
   verbose (...args) {
     if (constants.IS_DEBUG || constants.IS_VERBOSE) {
-      console.log(colors.verbose(...args))
+      validateSpinner(() => console.log(colors.verbose(...args)))
     }
   },
 
   info (...args) {
-    console.log(colors.info(...args))
+    validateSpinner(() => console.log(colors.info(...args)))
   },
 
   warning (...args) {
-    console.log(colors.warning(...args))
+    validateSpinner(() => console.log(colors.warning(...args)))
   },
 
   error (...args) {
-    console.log(colors.error(...args))
+    validateSpinner(() => console.log(colors.error(...args)))
+  }
+}
+
+function validateSpinner (func) {
+  let isSpinner = constants.Spinner.timer
+  if (isSpinner) {
+    constants.Spinner.stop()
+  }
+  func()
+  if (isSpinner) {
+    constants.Spinner.start()
   }
 }

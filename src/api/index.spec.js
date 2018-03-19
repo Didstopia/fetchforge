@@ -17,10 +17,10 @@ describe('App', () => {
     beforeEach(async () => {
       this.pathOverride = './tmp/fetchforge_unit_test'
       this.realPath = path.resolve(path.normalize(this.pathOverride))
-      console.log('--- REMOVING TEMPORARY DATA ---')
+      // console.log('--- REMOVING TEMPORARY DATA ---')
       await rimraf(this.realPath)
       mkdirp(this.realPath)
-      console.log('--- DONE REMOVING TEMPORARY DATA ---')
+      // console.log('--- DONE REMOVING TEMPORARY DATA ---')
     })
     it('Test exception handling', () => {
       expect(() => new API()).to.throw(Error)

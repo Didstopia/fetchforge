@@ -79,18 +79,17 @@
     "nyc": "^11.6.0",
     "pkg": "^4.3.0",
     "rimraf": "^2.6.2",
-    "sinon": "^4.4.4",
-    "snazzy": "7.0.0",
-    "standard": "^11.0.0"
+    "sinon": "^4.4.6",
+    "snazzy": "7.1.1",
+    "standard": "^11.0.1"
   },
   "dependencies": {
-    "ajv": "^6.2.1",
     "apollo-cache-persist": "^0.1.1",
     "apollo-client-preset": "^1.0.8",
     "clui": "^0.3.6",
     "colors": "^1.2.1",
     "figlet": "^1.2.0",
-    "graphql": "^0.12.3",
+    "graphql": "^0.13.2",
     "graphql-tag": "^2.8.0",
     "inquirer": "^5.1.0",
     "mkdir-recursive": "^0.4.0",
