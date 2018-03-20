@@ -5,7 +5,7 @@ require('dotenv').config()
 
 // Switch to verbose mode as early as possible
 let args = process.argv.slice(2)
-if (args.includes('-v') || args.includes('--verbose')) {
+if ((args.includes('-v') || args.includes('--verbose')) && process.env.NODE_ENV !== 'test') {
   process.env.NODE_ENV = 'verbose'
 }
 

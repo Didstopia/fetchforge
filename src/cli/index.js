@@ -28,8 +28,11 @@ class CLI {
       if (args.length) {
         // Enable verbose mode
         if (args.includes('-v') || args.includes('--verbose')) {
-          // Notify the user
-          log.info('Enabling verbose mode..\n')
+          // Set verbose mode and Notify the user (this is mainly set for unit tests)
+          process.env.NODE_ENV = 'verbose'
+          if (!constants.IS_TEST) {
+            log.info('Enabling verbose mode..\n')
+          }
 
           // Remove the verbose arguments, as we don't need them anymore
           if (args.indexOf('-v') !== -1) args.splice(args.indexOf('-v'), 1)
@@ -280,7 +283,9 @@ class CLI {
           spinner.stop()
 
           // Show a completion message to the user
-          log.info('All Done!\n')
+          if (!constants.IS_TEST) {
+            log.info('All Done!\n')
+          }
 
           // We're finished
           return resolve()
