@@ -129,10 +129,10 @@ class API {
             return {
               id: item.node.id,
               title: item.node.title,
-              game: {
+              game: item.node['game'] ? {
                 name: item.node.game.name,
                 slug: item.node.game.slug
-              },
+              } : { name: 'unknown', slug: 'unknown' },
               createdAt: item.node.createdAt,
               url: item.node.mp4,
               thumbnail: item.node.thumbnail.indexOf('http') !== -1 ? item.node.thumbnail : 'https:' + item.node.thumbnail
