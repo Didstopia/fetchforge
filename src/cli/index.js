@@ -279,8 +279,8 @@ class CLI {
           // Stop the spinner
           spinner.stop()
 
-          // TODO: Show a completion message to the user
-          log.debug('All done!')
+          // Show a completion message to the user
+          log.info('All done!')
 
           return resolve()
           // process.exit(0)

@@ -43,6 +43,10 @@ if (constants.IS_DEBUG) {
 // Hand over control to the CLI
 let cli = new CLI()
 cli.handleArgs(process.argv.slice(2))
+  .then(() => {
+    constants.Spinner.stop()
+    process.exit(0)
+  })
   .catch(err => {
     // All errors should bubble up here, so only report them here
     Raven.captureException(err)
