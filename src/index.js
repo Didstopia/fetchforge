@@ -15,6 +15,7 @@ const log = require('./utils/log')
 const CLI = require('./cli')
 const figlet = require('figlet')
 const Raven = require('raven')
+const Countly = require('countly-sdk-nodejs')
 
 // Setup graceful shutdown
 const shutdown = () => {
@@ -32,6 +33,14 @@ Raven.config(process.env.SENTRY_URL, {
   shouldSendCallback: () => constants.IS_RELEASE,
   autoBreadcrumbs: true
 }).install()
+
+// Setup analytics
+Countly.init({
+  app_key: process.env.COUNTLY_APP_KEY,
+  url: process.env.COUNTLY_URL/*,
+  debug: constants.IS_DEBUG */
+})
+Countly.begin_session()
 
 // Print the fetchforge banner
 log.info('')

@@ -42,8 +42,8 @@ class API {
       await persistCache({
         cache: cache,
         storage: new AsyncNodeStorage(cachePath),
-        maxSize: false,
-        debug: constants.IS_DEBUG
+        maxSize: false/*,
+        debug: constants.IS_DEBUG */
       })
         .catch(err => {
           return reject(err)
