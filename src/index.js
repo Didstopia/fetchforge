@@ -1,10 +1,14 @@
 #!/usr/bin/env node
 
+// Load dotenv
+require('dotenv').config()
+
 // Require dependencies
 const constants = require('./utils/constants')
 const log = require('./utils/log')
 const CLI = require('./cli')
 const figlet = require('figlet')
+const Raven = require('raven')
 
 // Setup graceful shutdown
 const shutdown = () => {
@@ -14,6 +18,14 @@ const shutdown = () => {
 }
 process.on('SIGTERM', shutdown)
 process.on('SIGINT', shutdown)
+
+// Setup error reporting
+Raven.config(process.env.SENTRY_URL, {
+  release: constants.APP_VERSION,
+  environment: constants.ENVIRONMENT,
+  shouldSendCallback: () => constants.IS_RELEASE,
+  autoBreadcrumbs: true
+}).install()
 
 // Print the fetchforge banner
 log.info('')
@@ -32,6 +44,8 @@ if (constants.IS_DEBUG) {
 let cli = new CLI()
 cli.handleArgs(process.argv.slice(2))
   .catch(err => {
+    // All errors should bubble up here, so only report them here
+    Raven.captureException(err)
     log.error(err)
     process.exit(1)
   })

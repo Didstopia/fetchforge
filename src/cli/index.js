@@ -47,7 +47,6 @@ class CLI {
           log.help(`  fetchforge ${constants.APP_VERSION}`)
           log.help('')
           return resolve()
-          // process.exit(0)
         }
 
         // Print command line usage instructions
@@ -66,7 +65,6 @@ class CLI {
           log.help('    -V / --version (show version information)')
           log.help('')
           return resolve()
-          // process.exit(0)
         }
       }
 
@@ -109,10 +107,15 @@ class CLI {
       if (args.length === 1) {
         // If we have exactly 1 argument, we can use that as the username
         log.debug('Enabling non-interactive mode')
-        resolve(await this.download(args[0], this.pathOverride))
+        await this.download(args[0], this.pathOverride)
+          .then(resolve)
+          .catch(err => {
+            return reject(err)
+          })
       } else if (args.length > 1) {
         // If we have more than 1 argument, we just bail out
-        return reject(new Error('Too many arguments'))
+        let err = new Error('Too many arguments')
+        return reject(err)
       } else {
         // If there are no arguments, we enable interactive mode
         log.debug('Enabling interactive mode')
@@ -127,7 +130,8 @@ class CLI {
   async download (username, pathOverride) {
     return new Promise(async (resolve, reject) => {
       if (!validator.isAlphanumeric(username)) {
-        return reject(new Error('Username is invalid or missing'))
+        let err = new Error('Username is invalid or missing')
+        return reject(err)
       }
 
       if (!pathOverride) {
@@ -202,8 +206,6 @@ class CLI {
 
             // Make sure the correct folder structure exists
             let gamePath = path.join(userPath, video.game.slug)
-            // mkdirp(downloadPath)
-            // mkdirp(userPath)
             mkdirp(gamePath)
 
             // Create a Date object from the video creation date string
@@ -277,7 +279,9 @@ class CLI {
           // Stop the spinner
           spinner.stop()
 
+          // TODO: Show a completion message to the user
           log.debug('All done!')
+
           return resolve()
           // process.exit(0)
         })
@@ -291,10 +295,14 @@ class CLI {
     return new Promise(async (resolve, reject) => {
       prompt({ type: 'input', name: 'username', message: 'Username to download from:' }).then(async (answers) => {
         if (answers['username'] && validator.isAlphanumeric(answers['username'])) {
-          resolve(await this.download(answers.username))
+          await this.download(answers.username)
+            .then(resolve)
+            .catch(err => {
+              return reject(err)
+            })
         } else {
-          reject(new Error('Username is invalid or missing'))
-          // process.exit(1)
+          let err = new Error('Username is invalid or missing')
+          return reject(err)
         }
       })
     })
