@@ -28,8 +28,8 @@ class CLI {
       if (args.length) {
         // Enable verbose mode
         if (args.includes('-v') || args.includes('--verbose')) {
-          // Switch to the verbose environment
-          process.env.NODE_ENV = 'verbose'
+          // Notify the user
+          log.info('Enabling verbose mode..\n')
 
           // Remove the verbose arguments, as we don't need them anymore
           if (args.indexOf('-v') !== -1) args.splice(args.indexOf('-v'), 1)
@@ -181,7 +181,7 @@ class CLI {
             let estimatedTotalTime = (total - skip) / chunksPerTime
             let timeLeftInSeconds = (estimatedTotalTime - elapsedTime) / 1000
             let withOneDecimalPlace = Math.round(timeLeftInSeconds * 10) / 10
-            if (isNaN(withOneDecimalPlace)) {
+            if (isNaN(withOneDecimalPlace) || index === skipIndex) {
               withOneDecimalPlace = 0
             }
             let newSpinnerText = `Downloading clip ${count} out of ${total} (${parseInt(count / total * 100)}%) - ${moment.duration(withOneDecimalPlace, 'seconds').humanize()} left`

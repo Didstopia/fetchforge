@@ -3,6 +3,12 @@
 // Load dotenv
 require('dotenv').config()
 
+// Switch to verbose mode as early as possible
+let args = process.argv.slice(2)
+if (args.includes('-v') || args.includes('--verbose')) {
+  process.env.NODE_ENV = 'verbose'
+}
+
 // Require dependencies
 const constants = require('./utils/constants')
 const log = require('./utils/log')
