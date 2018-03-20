@@ -280,10 +280,10 @@ class CLI {
           spinner.stop()
 
           // Show a completion message to the user
-          log.info('All done!')
+          log.info('All Done!\n')
 
+          // We're finished
           return resolve()
-          // process.exit(0)
         })
         .catch(err => {
           return reject(err)
