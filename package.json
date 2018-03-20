@@ -1,6 +1,6 @@
 {
   "name": "fetchforge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A command line application for downloading clips from forge.gg",
   "main": "src/index.js",
   "preferGlobal": true,
@@ -88,6 +88,7 @@
     "apollo-client-preset": "^1.0.8",
     "clui": "^0.3.6",
     "colors": "^1.2.1",
+    "dotenv": "^5.0.1",
     "figlet": "^1.2.0",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.8.0",
@@ -95,6 +96,7 @@
     "mkdir-recursive": "^0.4.0",
     "moment": "^2.21.0",
     "r2": "^2.0.0",
+    "raven": "^2.4.2",
     "redux-persist-node-storage": "^2.0.0",
     "sanitize-filename": "^1.6.1",
     "validator": "^9.4.1"
