@@ -13,6 +13,7 @@ script:
   - npm run coverage
 before_deploy:
   - echo "SENTRY_URL=${SENTRY_URL}" > .env
+  - mkdir -p ${BUILD_PATH}
   - npm run package
   - find ${TRAVIS_BUILD_DIR}/build -name 'fetchforge-*' -print -exec zip -j '{}.zip' '{}' \; -exec rm -f '{}' \;
   - find ${TRAVIS_BUILD_DIR}/build -name 'fetchforge-*.exe.zip' -print -exec sh -c 'mv {} $(echo {} | cut -f 1 -d .).zip' \;
