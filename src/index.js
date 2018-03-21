@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // Load dotenv
-require('dotenv').config()
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') })
 
 // Switch to verbose mode as early as possible
 let args = process.argv.slice(2)
