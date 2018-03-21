@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Load dotenv
+// Load dotenv (zeit's pkg specific path logic)
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') })
 
 // Switch to verbose mode as early as possible
@@ -26,21 +26,24 @@ const shutdown = () => {
 process.on('SIGTERM', shutdown)
 process.on('SIGINT', shutdown)
 
-// Setup error reporting
-Raven.config(process.env.SENTRY_URL, {
-  release: constants.APP_VERSION,
-  environment: constants.ENVIRONMENT,
-  shouldSendCallback: () => constants.IS_RELEASE,
-  autoBreadcrumbs: true
-}).install()
+// Production specific setup
+if (constants.IS_RELEASE) {
+  // Setup error reporting
+  Raven.config(process.env.SENTRY_URL, {
+    release: constants.APP_VERSION,
+    environment: constants.ENVIRONMENT,
+    shouldSendCallback: () => constants.IS_RELEASE,
+    autoBreadcrumbs: true
+  }).install()
 
-// Setup analytics
-Countly.init({
-  app_key: process.env.COUNTLY_APP_KEY,
-  url: process.env.COUNTLY_URL/*,
-  debug: constants.IS_DEBUG */
-})
-Countly.begin_session()
+  // Setup analytics
+  Countly.init({
+    app_key: process.env.COUNTLY_APP_KEY,
+    url: process.env.COUNTLY_URL/*,
+    debug: constants.IS_DEBUG */
+  })
+  Countly.begin_session()
+}
 
 // Print the fetchforge banner
 log.info('')
