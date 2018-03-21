@@ -1,6 +1,6 @@
 {
   "name": "fetchforge",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A command line application for downloading clips from forge.gg",
   "main": "src/index.js",
   "preferGlobal": true,
@@ -20,7 +20,11 @@
       "linux-x64"
     ],
     "assets": [
-      "node_modules/figlet/fonts/*"
+      "node_modules/figlet/fonts/*",
+      "node_modules/countly-sdk-nodejs/data/__cly_queue.json",
+      "node_modules/countly-sdk-nodejs/data/__cly_id.json",
+      "node_modules/raven/lib/instrumentation/console.js",
+      "node_modules/raven/lib/instrumentation/http.js"
     ]
   },
   "nyc": {
@@ -44,6 +48,11 @@
       "src/utils/constants.js",
       "pkg.js",
       "src/index.js"
+    ]
+  },
+  "greenkeeper": {
+    "ignore": [
+      "sinon"
     ]
   },
   "repository": {
@@ -79,7 +88,7 @@
     "nyc": "^11.6.0",
     "pkg": "^4.3.0",
     "rimraf": "^2.6.2",
-    "sinon": "^5.0.0",
+    "sinon": "^4.4.8",
     "snazzy": "7.1.1",
     "standard": "^11.0.1"
   },
@@ -88,6 +97,7 @@
     "apollo-client-preset": "^1.0.8",
     "clui": "^0.3.6",
     "colors": "^1.2.1",
+    "countly-sdk-nodejs": "Didstopia/countly-sdk-nodejs",
     "dotenv": "^5.0.1",
     "figlet": "^1.2.0",
     "graphql": "^0.13.2",
