@@ -20,6 +20,7 @@
       "linux-x64"
     ],
     "assets": [
+      ".env",
       "node_modules/figlet/fonts/*",
       "node_modules/countly-sdk-nodejs/data/__cly_queue.json",
       "node_modules/countly-sdk-nodejs/data/__cly_id.json",
