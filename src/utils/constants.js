@@ -1,5 +1,6 @@
 const pkg = require('../../package.json')
 const path = require('path')
+const os = require('os')
 const Spinner = require('clui').Spinner
 
 module.exports = Object.freeze({
@@ -20,7 +21,7 @@ module.exports = Object.freeze({
   FORGE_USERID_REGEX: /(?:.*)\/avatars\/([0-9]+)(?:.*).png/,
 
   // Platform constants
-  DOWNLOAD_PATH: path.join(process.platform === 'win32' ? process.env.HOMEPATH : process.env.HOME, 'Downloads'),
+  DOWNLOAD_PATH: path.join(os.homedir(), 'Downloads'),
 
   // Spinner
   Spinner: process.env.NODE_ENV === 'test' ? {

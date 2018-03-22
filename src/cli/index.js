@@ -284,7 +284,7 @@ class CLI {
 
           // Show a completion message to the user
           if (!constants.IS_TEST) {
-            log.info('All Done!\n')
+            log.info('All Done!')
           }
 
           // We're finished
