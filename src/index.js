@@ -62,12 +62,22 @@ if (constants.IS_DEBUG) {
 let cli = new CLI()
 cli.handleArgs(process.argv.slice(2))
   .then(() => {
-    constants.Spinner.stop()
-    process.exit(0)
+    pressAnyKeyHandler(0)
   })
   .catch(err => {
     // All errors should bubble up here, so only report them here
     Raven.captureException(err)
     log.error(err)
-    process.exit(1)
+    pressAnyKeyHandler(1)
   })
+
+const pressAnyKeyHandler = (exitCode = 0) => {
+  constants.Spinner.stop()
+  log.warning('')
+  log.warning('Press any key to exit..')
+  // log.warning('')
+  constants.Spinner.stop()
+  process.stdin.setRawMode(true)
+  process.stdin.resume()
+  process.stdin.on('data', process.exit.bind(process, exitCode))
+}
