@@ -98,7 +98,7 @@
     "apollo-client-preset": "^1.0.8",
     "clui": "^0.3.6",
     "colors": "^1.2.1",
-    "countly-sdk-nodejs": "Didstopia/countly-sdk-nodejs",
+    "countly-sdk-nodejs": "Countly/countly-sdk-nodejs",
     "dotenv": "^5.0.1",
     "figlet": "^1.2.0",
     "graphql": "^0.13.2",
