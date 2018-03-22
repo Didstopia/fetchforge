@@ -10,6 +10,8 @@ if ((args.includes('-v') || args.includes('--verbose')) && process.env.NODE_ENV 
 }
 
 // Require dependencies
+const path = require('path')
+const os = require('os')
 const constants = require('./utils/constants')
 const log = require('./utils/log')
 const CLI = require('./cli')
@@ -39,7 +41,8 @@ if (constants.IS_RELEASE) {
   // Setup analytics
   Countly.init({
     app_key: process.env.COUNTLY_APP_KEY,
-    url: process.env.COUNTLY_URL/*,
+    url: process.env.COUNTLY_URL,
+    storage_path: path.join(os.tmpdir(), 'countly-sdk-nodejs')/*,
     debug: constants.IS_DEBUG */
   })
   Countly.begin_session()
