@@ -1,5 +1,5 @@
 language: node_js
-node_js: node
+node_js: "8"
 env:
   global:
     - PKG_CACHE_PATH=${TRAVIS_BUILD_DIR}/.pkg
