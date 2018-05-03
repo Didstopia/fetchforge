@@ -110,6 +110,6 @@
     "raven": "^2.6.0",
     "redux-persist-node-storage": "^2.0.0",
     "sanitize-filename": "^1.6.1",
-    "validator": "^9.4.1"
+    "validator": "^10.0.0"
   }
 }
