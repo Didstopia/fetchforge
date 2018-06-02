@@ -103,7 +103,7 @@
     "figlet": "^1.2.0",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.1",
-    "inquirer": "^5.2.0",
+    "inquirer": "^6.0.0",
     "mkdir-recursive": "^0.4.0",
     "moment": "^2.22.1",
     "r2": "^2.0.1",
