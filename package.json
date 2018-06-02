@@ -99,7 +99,7 @@
     "clui": "^0.3.6",
     "colors": "^1.2.1",
     "countly-sdk-nodejs": "Countly/countly-sdk-nodejs",
-    "dotenv": "^5.0.1",
+    "dotenv": "^6.0.0",
     "figlet": "^1.2.0",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.1",
