@@ -101,7 +101,7 @@
     "countly-sdk-nodejs": "Countly/countly-sdk-nodejs",
     "dotenv": "^5.0.1",
     "figlet": "^1.2.0",
-    "graphql": "^0.13.2",
+    "graphql": "^14.0.0-rc.1",
     "graphql-tag": "^2.9.1",
     "inquirer": "^5.2.0",
     "mkdir-recursive": "^0.4.0",
