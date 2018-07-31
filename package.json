@@ -1,6 +1,6 @@
 {
   "name": "fetchforge",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "A command line application for downloading clips from forge.gg",
   "main": "src/index.js",
   "preferGlobal": true,
