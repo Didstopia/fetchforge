@@ -132,7 +132,7 @@ class CLI {
 
   async download (username, pathOverride) {
     return new Promise(async (resolve, reject) => {
-      //if (!validator.isAlphanumeric(username)) {
+      // if (!validator.isAlphanumeric(username)) {
       if (!username) {
         let err = new Error('Username is invalid or missing')
         return reject(err)
