@@ -118,6 +118,12 @@ class API {
         .then(async response => {
           // log.debug('Response:', JSON.stringify(response, null, 2))
 
+          if (!response.data.user) {
+            let err = new Error(`Failed to list any clips. Possibly invalid username: "${this.username}"`)
+            this.spinner.stop()
+            throw err
+          }
+
           // Format the results
           let result = {
             videos: response.data.user._videos20YgKr.edges.map((item) => {
