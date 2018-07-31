@@ -214,6 +214,11 @@ class CLI {
             // Create a Date object from the video creation date string
             let videoCreationDate = new Date(video.createdAt)
 
+            // Add missing schema if necessary
+            if (video.url.startsWith('//')) {
+              video.url = `https:${video.url}`
+            }
+
             // Create unique and sanitized filenames for all of the data
             let baseName = sanitize(video.title ? `${video.title}_${video.id}` : `Untitled_${video.id}`)
               .replace(/\s/g, '_') // Replace spaces with underscors
