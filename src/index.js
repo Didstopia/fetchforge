@@ -10,8 +10,8 @@ if ((args.includes('-v') || args.includes('--verbose')) && process.env.NODE_ENV 
 }
 
 // Require dependencies
-const path = require('path')
-const os = require('os')
+// const path = require('path')
+// const os = require('os')
 const constants = require('./utils/constants')
 const log = require('./utils/log')
 const CLI = require('./cli')
