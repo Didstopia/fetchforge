@@ -17,7 +17,7 @@ const log = require('./utils/log')
 const CLI = require('./cli')
 const figlet = require('figlet')
 const Raven = require('raven')
-const Countly = require('countly-sdk-nodejs')
+// const Countly = require('countly-sdk-nodejs')
 
 // Setup graceful shutdown
 const shutdown = () => {
@@ -38,14 +38,13 @@ if (constants.IS_RELEASE) {
     autoBreadcrumbs: true
   }).install()
 
-  // Setup analytics
+  /* // Setup analytics
   Countly.init({
     app_key: process.env.COUNTLY_APP_KEY,
     url: process.env.COUNTLY_URL,
-    storage_path: path.join(os.tmpdir(), 'countly-sdk-nodejs')/*,
-    debug: constants.IS_DEBUG */
+    storage_path: path.join(os.tmpdir(), 'countly-sdk-nodejs')
   })
-  Countly.begin_session()
+  Countly.begin_session() */
 }
 
 // Print the fetchforge banner
