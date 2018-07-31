@@ -2,7 +2,7 @@ const constants = require('../utils/constants')
 const log = require('../utils/log')
 const { prompt } = require('inquirer')
 const r2 = require('r2')
-const validator = require('validator')
+// const validator = require('validator')
 const fs = require('fs')
 const path = require('path')
 const promisify = require('util').promisify
@@ -132,7 +132,8 @@ class CLI {
 
   async download (username, pathOverride) {
     return new Promise(async (resolve, reject) => {
-      if (!validator.isAlphanumeric(username)) {
+      //if (!validator.isAlphanumeric(username)) {
+      if (!username) {
         let err = new Error('Username is invalid or missing')
         return reject(err)
       }
@@ -304,7 +305,7 @@ class CLI {
   promptForUser () {
     return new Promise(async (resolve, reject) => {
       prompt({ type: 'input', name: 'username', message: 'Username to download from:' }).then(async (answers) => {
-        if (answers['username'] && validator.isAlphanumeric(answers['username'])) {
+        if (answers['username'] && answers['username'] /* validator.isAlphanumeric(answers['username']) */) {
           await this.download(answers.username)
             .then(resolve)
             .catch(err => {
