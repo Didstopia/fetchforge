@@ -98,7 +98,7 @@
     "apollo-client-preset": "^1.0.8",
     "clui": "^0.3.6",
     "colors": "^1.3.1",
-    "dotenv": "^6.0.0",
+    "dotenv": "6.0.0",
     "figlet": "^1.2.0",
     "graphql": "^14.0.0-rc.1",
     "inquirer": "^6.0.0",
